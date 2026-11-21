@@ -46,7 +46,9 @@ Versioning: [SemVer](https://semver.org/) for the package; the CIP schema is ver
   - `forked verify DIR [--json]`: offline, needs only the package. Reports integrity
     (changed / missing / unexpected files, manifest problems) separately from validity
     (comparison recomputed from the packaged runs; inflated or mismatched claims are
-    `unsupported`). Rejects symlinks. Exit 1 if either fails.
+    `unsupported`; the whole manifest is regenerated from the packaged runs and must match
+    exactly, and `comparison.json` must equal the recomputed comparison). Rejects symlinks.
+    Exit 1 if either fails.
 
 ### Not implemented yet
 - Framework adapters, OpenTelemetry bridge, FCRB benchmark (Phase 5); user-approved effect

@@ -33,7 +33,7 @@ tarea, auditar lo que hizo una IA sin releer todo el diff y correlacionar un fal
 
 | Fecha | Sesión | Rama | Áreas | Impacto | Fallos |
 |---|---|---|---|---|---|
-| 2026-11-21 | [Fase 4: paquete de evidencia y verificador offline](2026-11-21-d-fase-4-evidencia.md) | `main` | dominio, adaptador, CLI, CI | [2026-11-21 (d)](../impacto/2026-11-21-d-fase-4-evidencia.md) | ninguna |
+| 2026-11-21 | [Fase 4: paquete de evidencia y verificador offline](2026-11-21-d-fase-4-evidencia.md) | `main` | dominio, adaptador, CLI, CI | [2026-11-21 (d)](../impacto/2026-11-21-d-fase-4-evidencia.md) | [B-001](../errores/bugs/B-001-el-verificador-solo-revisaba-el-titular-de-la-afirmacion.md) |
 | 2026-11-21 | [Fase 3: ramas, intervención, política y comparación](2026-11-21-c-fase-3-ramas.md) | `main` | dominio, SDK, CLI, CI | [2026-11-21 (c)](../impacto/2026-11-21-c-fase-3-ramas.md) | ninguna |
 | 2026-11-21 | [Publicación en GitHub y Fase 2 (replay)](2026-11-21-b-publicacion-y-fase-2.md) | `main` | GitHub, replay, SDK, CLI, CI | [2026-11-21 (b)](../impacto/2026-11-21-b-publicacion-y-fase-2.md) | ninguna |
 | 2026-11-21 | [Arranque del proyecto: memoria `contexto/`, revisión de preparación, Fase 0 y Fase 1](2026-11-21-arranque-fase-0-y-1.md) | `main` | todo el repositorio | [2026-11-21](../impacto/2026-11-21-arranque-fase-0-y-1.md) | [E-001](../errores/errores/E-001-el-guardian-del-grafo-no-veia-mayusculas-en-windows.md) |

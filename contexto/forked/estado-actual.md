@@ -36,8 +36,8 @@
 - `forked export <base> <rama> --out DIR` y `forked verify DIR`: paquete determinista con SHA-256 por artefacto;
   el verificador funciona solo con el paquete y separa integridad de validez, recalculando la comparación
   ([contexto `evidence`](../modulos/evidence/README.md)).
-- **178 tests** (1 se salta en Windows: symlinks) (unidad, contrato, seguridad, integración, aceptación, guardianes) + ruff + mypy strict en verde, y
-  31 mutaciones dirigidas detectadas (una sobrevivió y generó un test nuevo, ver la
+- **189 tests** (1 se salta en Windows: symlinks) (unidad, contrato, seguridad, integración, aceptación, guardianes) + ruff + mypy strict en verde, y
+  34 mutaciones dirigidas detectadas (una sobrevivió y generó un test nuevo, ver la
   [bitácora de la Fase 3](../sesiones/2026-11-21-c-fase-3-ramas.md#6-cómo-verificar)). Comandos en las bitácoras
   ([Fases 0–1](../sesiones/2026-11-21-arranque-fase-0-y-1.md#6-cómo-verificar),
   [Fase 2](../sesiones/2026-11-21-b-publicacion-y-fase-2.md#6-cómo-verificar)).

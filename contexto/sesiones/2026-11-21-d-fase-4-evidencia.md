@@ -9,7 +9,7 @@
 | **Rama** | `main` |
 | **Commits** | commit de la Fase 4 (ver `git log`) |
 | **Análisis de impacto** | [`../impacto/2026-11-21-d-fase-4-evidencia.md`](../impacto/2026-11-21-d-fase-4-evidencia.md) |
-| **Fichas de fallo** | ninguna |
+| **Fichas de fallo** | [B-001](../errores/bugs/B-001-el-verificador-solo-revisaba-el-titular-de-la-afirmacion.md) |
 
 ## 1. Qué se pidió
 
@@ -64,3 +64,10 @@ uv run forked verify $S/pkg               # integrity ok · validity controlled_
 Mutaciones (aplicadas y revertidas una a una): hash no comparado 2 · extras ignorados 1 · afirmaciones sin revisar 2
 · sin escaneo de credenciales 1 · toda ruta segura 7 · `ok` ignora validez 2 · sobrescribir directorio 1 · formato
 sin revisar 1. Todas detectadas.
+
+### Corrección posterior al commit `ba69084`
+
+Una revisión de seguridad automática señaló que la validez solo revisaba el nivel de afirmación y el estado de las
+invariantes ([B-001](../errores/bugs/B-001-el-verificador-solo-revisaba-el-titular-de-la-afirmacion.md)). Arreglo:
+regenerar el manifiesto completo y comparar `comparison.json` byte a byte. 11 tests nuevos (189 passed, 1 skipped);
+mutaciones: sin regeneración 4 rojos, sin chequeo de `comparison.json` 1, invariantes extra permitidas 1.

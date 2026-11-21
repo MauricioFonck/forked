@@ -28,7 +28,7 @@ primera ficha de producto.
 
 | # | Título | Contexto | Concepto que faltó |
 |---|---|---|---|
-| — | Ninguno todavía (proyecto iniciado el 2026-11-21) | — | — |
+| [B-001](bugs/B-001-el-verificador-solo-revisaba-el-titular-de-la-afirmacion.md) | El verificador solo revisaba el titular de la afirmación | evidence | Verificar una lista blanca de campos deja pasar los olvidados: regenerar y comparar el todo |
 
 ## Índice — Errores de entorno
 

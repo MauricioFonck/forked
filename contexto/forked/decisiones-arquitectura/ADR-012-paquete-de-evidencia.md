@@ -24,8 +24,9 @@ reportar «afirmaciones no soportadas» y excluir secretos.
    cubierto por el manifiesto) o el manifiesto es ilegible, de otro formato, de un `cip_version` no soportado, o con
    rutas inseguras/duplicadas. Si la integridad falla, la validez **no se evalúa**.
 4. **Validez por recálculo:** `runs/` del paquete tiene el layout del store, así que el verificador abre el paquete
-   como store de solo lectura y **recalcula** la comparación. Toda diferencia con el manifiesto es un problema; si el
-   manifiesto afirma más (causal, o `verified` donde sale otra cosa) es `unsupported claim`.
+   como store de solo lectura, **recalcula** la comparación y **regenera el manifiesto completo** (la exportación es
+   determinista): debe ser idéntico al empaquetado, y `comparison.json` idéntico al recalculado. Toda diferencia es
+   `unsupported claim` (refinado tras [B-001](../../errores/bugs/B-001-el-verificador-solo-revisaba-el-titular-de-la-afirmacion.md)).
 5. **Sin firma.** La gestión de claves está fuera del alcance local-first de v0. Se publica `package_digest` (SHA-256
    del manifiesto) para comparar fuera de banda, y la limitación va dentro del propio manifiesto.
 6. **Seguridad de exportación:** rutas validadas con una lista blanca **antes** de resolver; symlinks rechazados al

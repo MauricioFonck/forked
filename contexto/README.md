@@ -167,6 +167,7 @@ fichas, estos son los conceptos que **ya** se aplicaron por diseño, para no apr
 | Un parcial nunca se hace pasar por completo | Run sin finalizar ⇒ `incomplete` (CP-007) |
 | El texto libre filtra secretos | El motivo de fallo pasa por la redacción (CP-005) |
 | LF en todo artefacto comparado byte a byte | [`.gitattributes`](../.gitattributes) |
+| Un verificador compara **todo** lo atestiguado contra un recálculo | [B-001](errores/bugs/B-001-el-verificador-solo-revisaba-el-titular-de-la-afirmacion.md) |
 | Normalizar antes de validar destruye la evidencia | [E-001](errores/errores/E-001-el-guardian-del-grafo-no-veia-mayusculas-en-windows.md) |
 
 ## 10. Glosario

@@ -75,4 +75,6 @@ def verify_package(package: Path) -> VerificationReport:
     """Verify an evidence package offline. Needs nothing but the package directory."""
     files = read_package(package)
     view = FileSystemRunStore(package)  # the package's runs/ has the store layout; read-only use
-    return verify_evidence(files, CompareRuns(view, view))
+    inspect, compare = InspectRun(view, view), CompareRuns(view, view)
+    regenerate = ExportEvidence(inspect, compare, view, RedactionPolicy())
+    return verify_evidence(files, compare, regenerate.execute)

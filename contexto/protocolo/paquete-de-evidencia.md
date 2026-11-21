@@ -37,7 +37,7 @@ Claves ordenadas, indentación 2, UTF-8, salto de línea final. Sin hora de expo
 | Pregunta | Qué se comprueba | Falla si |
 |---|---|---|
 | Integridad | Manifiesto legible, formato y versión soportados; cada artefacto con su SHA-256 y tamaño | cambiado, faltante, extra, ruta insegura/duplicada, manifiesto inválido |
-| Validez (solo si la integridad pasa) | Se recalcula la comparación desde `runs/` y se contrasta con `claim` e `invariants` | nivel o estado distinto; afirmación más fuerte que la evidencia ⇒ `unsupported claim` |
+| Validez (solo si la integridad pasa) | Se recalcula la comparación desde `runs/` y se **regenera el manifiesto**; `comparison.json` y el manifiesto deben coincidir exactamente | cualquier campo atestiguado distinto (nivel, statement, invariantes extra, entorno, política, limitaciones…) ⇒ `unsupported claim` |
 
 Salida: `package_digest` (SHA-256 del manifiesto) para comparar con una copia obtenida por otra vía; códigos de salida
 0 (todo bien), 1 (integridad o validez fallan), 2 (no es un directorio de paquete, symlink, error).

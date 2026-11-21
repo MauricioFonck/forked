@@ -12,12 +12,15 @@ The layout of ``runs/`` matches the store's, so the verifier can recompute the c
 by opening the package itself as a read-only store.
 """
 
+import json
+from collections.abc import Callable
 from dataclasses import dataclass
 
 from forked.application.ports import ArtifactReader
 from forked.application.queries.inspect_run import CompareRuns, InspectRun
 from forked.domain.comparison.compare import Comparison
 from forked.domain.evidence.package import (
+    MANIFEST,
     VALIDITY_NOTE,
     Integrity,
     build_package,
@@ -109,8 +112,24 @@ class VerificationReport:
         return self.integrity.ok and self.validity.evaluated and not self.validity.problems
 
 
-def verify_evidence(files: dict[str, bytes], compare: CompareRuns) -> VerificationReport:
-    """``compare`` must read from the package itself (see the module docstring)."""
+Regenerate = Callable[[RunId, RunId], dict[str, bytes]]
+
+
+def _manifest_drift(packaged: bytes, regenerated: bytes) -> tuple[str, ...]:
+    a, b = json.loads(packaged), json.loads(regenerated)
+    keys = sorted(k for k in set(a) | set(b) if a.get(k) != b.get(k))
+    return tuple(f"unsupported claim: manifest field {k!r} differs from the evidence" for k in keys)
+
+
+def verify_evidence(
+    files: dict[str, bytes], compare: CompareRuns, regenerate: Regenerate
+) -> VerificationReport:
+    """``compare`` and ``regenerate`` must read from the package itself (module docstring).
+
+    Validity = the claim checks plus an exact match between the packaged manifest and the
+    one the packaged runs regenerate (export is deterministic), so no attested field —
+    environment, policy, limitations, verification methods — escapes the check.
+    """
     integrity = check_integrity(files)
     if not integrity.ok or integrity.manifest is None:
         skipped = Validity(False, None, (), ("not evaluated: integrity check failed",))
@@ -125,12 +144,20 @@ def verify_evidence(files: dict[str, bytes], compare: CompareRuns) -> Verificati
     except ForkedError as exc:
         failed = Validity(True, None, (), (f"cannot recompute comparison: {exc}",))
         return VerificationReport(integrity, failed)
+    problems = check_claims(integrity.manifest, recomputed, files.get("comparison.json"))
+    try:
+        expected = regenerate(RunId(recomputed.baseline_id), RunId(recomputed.branch_id))
+        if expected[MANIFEST] != files[MANIFEST]:
+            drift = _manifest_drift(files[MANIFEST], expected[MANIFEST])
+            problems += drift or ("unsupported claim: manifest bytes differ from the evidence",)
+    except ForkedError as exc:
+        problems += (f"cannot regenerate manifest: {exc}",)
     return VerificationReport(
         integrity,
         Validity(
             evaluated=True,
             claim_level=recomputed.claim_level.value,
             invariants=tuple((i.id, i.status.value) for i in recomputed.invariants),
-            problems=check_claims(integrity.manifest, recomputed),
+            problems=tuple(dict.fromkeys(problems)),
         ),
     )

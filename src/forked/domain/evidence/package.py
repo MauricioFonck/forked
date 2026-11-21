@@ -161,9 +161,29 @@ def check_integrity(files: Mapping[str, bytes]) -> Integrity:
     )
 
 
-def check_claims(manifest: Mapping[str, JsonValue], recomputed: Comparison) -> tuple[str, ...]:
-    """Problems where the manifest claims more than (or differently from) the evidence."""
+def check_claims(
+    manifest: Mapping[str, JsonValue], recomputed: Comparison, comparison_json: bytes | None
+) -> tuple[str, ...]:
+    """Problems where the package states anything the evidence does not reproduce.
+
+    Every attested field is recomputed, not just the headline claim: an attacker who
+    rewrites a statement or adds an invariant and fixes the hashes must still fail here.
+    """
     problems: list[str] = []
+    if comparison_json != comparison_bytes(recomputed):
+        problems.append("unsupported claim: comparison.json differs from the recomputed comparison")
+    experiment = manifest.get("experiment")
+    exp = experiment if isinstance(experiment, dict) else {}
+    expected_experiment = {
+        "baseline": recomputed.baseline_id,
+        "branch": recomputed.branch_id,
+        "intervention": recomputed.intervention,
+    }
+    for key, value in expected_experiment.items():
+        if exp.get(key) != value:
+            problems.append(f"unsupported claim: experiment.{key} differs from the evidence")
+    if manifest.get("missing_evidence") != list(recomputed.missing_evidence):
+        problems.append("unsupported claim: missing_evidence differs from the evidence")
     claim = manifest.get("claim")
     level = claim.get("level") if isinstance(claim, dict) else None
     if level not in {c.value for c in ClaimLevel}:
@@ -175,12 +195,20 @@ def check_claims(manifest: Mapping[str, JsonValue], recomputed: Comparison) -> t
             f"unsupported claim: manifest says {level}, packaged evidence supports "
             f"{recomputed.claim_level}"
         )
+    if not isinstance(claim, dict) or claim.get("statement") != recomputed.statement:
+        problems.append("unsupported claim: claim.statement differs from the recomputed statement")
     declared = manifest.get("invariants")
     stated = {
         str(i.get("id")): i.get("status")
         for i in (declared if isinstance(declared, list) else [])
         if isinstance(i, dict)
     }
+    known = {inv.id for inv in recomputed.invariants}
+    entries = declared if isinstance(declared, list) else []
+    if len(entries) != len(stated):
+        problems.append("invariants list is malformed or repeats an id")
+    for extra in sorted(set(stated) - known):
+        problems.append(f"unsupported claim: invariant {extra} is not produced by the evidence")
     for inv in recomputed.invariants:
         if inv.id not in stated:
             problems.append(f"invariant {inv.id} missing from manifest")

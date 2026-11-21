@@ -150,6 +150,80 @@ def test_rehashed_tampering_is_caught_by_recomputation(package: Path) -> None:
     assert any("inv_parent_unchanged" in p and "unsupported" in p for p in report.validity.problems)
 
 
+def _rehash(package: Path, manifest: dict) -> None:  # type: ignore[type-arg]
+    for entry in manifest["artifacts"]:
+        data = (package / entry["path"]).read_bytes()
+        entry["sha256"], entry["bytes"] = sha256(data), len(data)
+    _rewrite_manifest(package, manifest)
+
+
+@pytest.mark.parametrize(
+    ("edit", "expected"),
+    [
+        (lambda m: m["claim"].update(statement="Proven: the rate causes it."), "claim.statement"),
+        (
+            lambda m: (
+                m.update(missing_evidence=[])
+                if m["missing_evidence"]
+                else m.update(missing_evidence=["x"])
+            ),
+            "missing_evidence",
+        ),
+        (lambda m: m["experiment"]["intervention"].update(value=0.1), "experiment.intervention"),
+        (lambda m: m["experiment"].update(branch="run_ffffffffffffffff"), "cannot recompute"),
+        (
+            lambda m: m["invariants"].append({"id": "inv_made_up", "status": "verified"}),
+            "inv_made_up",
+        ),
+        (lambda m: m["invariants"].append(m["invariants"][0]), "repeats an id"),
+    ],
+)
+def test_every_attested_manifest_field_is_recomputed(package: Path, edit, expected: str) -> None:
+    manifest = _manifest(package)
+    edit(manifest)
+    _rewrite_manifest(package, manifest)
+
+    report = verify_package(package)
+
+    assert report.integrity.ok
+    assert not report.ok
+    assert any(expected in p for p in report.validity.problems), report.validity.problems
+
+
+@pytest.mark.parametrize(
+    ("edit", "field"),
+    [
+        (lambda m: m["environment"]["branch"].update(platform="Plan9"), "environment"),
+        (lambda m: m["experiment"].update(effects_policy="allow-all/1"), "experiment"),
+        (lambda m: m.update(limitations=[]), "limitations"),
+        (lambda m: m["invariants"][0].update(verification="trust_me"), "invariants"),
+    ],
+)
+def test_fields_outside_the_comparison_are_regenerated(package: Path, edit, field: str) -> None:
+    manifest = _manifest(package)
+    edit(manifest)
+    _rewrite_manifest(package, manifest)
+
+    report = verify_package(package)
+
+    assert report.integrity.ok
+    assert f"unsupported claim: manifest field {field!r} differs from the evidence" in (
+        report.validity.problems
+    )
+
+
+def test_rewritten_comparison_json_with_fixed_hash_is_unsupported(package: Path) -> None:
+    comparison = json.loads((package / "comparison.json").read_text(encoding="utf-8"))
+    comparison["statement"] = "Causal effect demonstrated."
+    (package / "comparison.json").write_text(json.dumps(comparison, indent=2), encoding="utf-8")
+    _rehash(package, _manifest(package))
+
+    report = verify_package(package)
+
+    assert report.integrity.ok
+    assert any("comparison.json differs" in p for p in report.validity.problems)
+
+
 @pytest.mark.parametrize(
     ("mutate", "expected"),
     [
