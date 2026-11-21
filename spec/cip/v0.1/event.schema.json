@@ -1,0 +1,170 @@
+{
+  "$defs": {
+    "CaptureStatus": {
+      "description": "How faithfully the payload of one event was persisted.",
+      "enum": [
+        "captured",
+        "redacted",
+        "omitted"
+      ],
+      "title": "CaptureStatus",
+      "type": "string"
+    },
+    "EffectClass": {
+      "description": "What an operation can do to state outside the experiment boundary.",
+      "enum": [
+        "pure_local",
+        "recorded_read",
+        "external_read",
+        "external_write",
+        "local_write",
+        "unknown"
+      ],
+      "title": "EffectClass",
+      "type": "string"
+    },
+    "EventType": {
+      "enum": [
+        "run.started",
+        "tool.call",
+        "tool.result",
+        "tool.error",
+        "run.completed",
+        "run.failed"
+      ],
+      "title": "EventType",
+      "type": "string"
+    },
+    "JsonValue": {}
+  },
+  "$id": "https://forked.dev/schema/cip/0.1/event.schema.json",
+  "description": "One line of ``events.jsonl``.",
+  "properties": {
+    "capture_status": {
+      "$ref": "#/$defs/CaptureStatus"
+    },
+    "effect_class": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/EffectClass"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "event_id": {
+      "title": "Event Id",
+      "type": "string"
+    },
+    "event_type": {
+      "$ref": "#/$defs/EventType"
+    },
+    "parent_event_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Parent Event Id"
+    },
+    "payload": {
+      "$ref": "#/$defs/JsonValue",
+      "default": null
+    },
+    "payload_digest": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Payload Digest"
+    },
+    "redacted_paths": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Redacted Paths",
+      "type": "array"
+    },
+    "run_id": {
+      "title": "Run Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "sequence": {
+      "minimum": 0,
+      "title": "Sequence",
+      "type": "integer"
+    },
+    "source": {
+      "title": "Source",
+      "type": "string"
+    },
+    "span_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Span Id"
+    },
+    "timestamp": {
+      "format": "date-time",
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "tool_name": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Tool Name"
+    },
+    "trace_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Trace Id"
+    }
+  },
+  "required": [
+    "schema_version",
+    "event_id",
+    "run_id",
+    "sequence",
+    "event_type",
+    "timestamp",
+    "source",
+    "capture_status"
+  ],
+  "title": "FORKED event envelope",
+  "type": "object"
+}

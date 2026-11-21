@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use FORKED in research, please cite it as below. FORKED is pre-alpha; cite the exact version you used."
+title: "FORKED: Open Counterfactual Computing Infrastructure"
+type: software
+authors:
+  - name: "FORKED maintainers"
+version: 0.1.0.dev0
+date-released: 2026-11-21
+license: Apache-2.0
+repository-code: "https://github.com/MauricioFonck/forked"
+keywords:
+  - counterfactual experiments
+  - AI agents
+  - replay
+  - provenance
+  - evidence

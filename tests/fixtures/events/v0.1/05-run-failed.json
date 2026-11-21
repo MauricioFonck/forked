@@ -1,0 +1,12 @@
+{
+  "schema_version": "0.1.0",
+  "event_id": "evt_00000000000000000000000000000005",
+  "run_id": "run_00000000000000000000000000000001",
+  "sequence": 4,
+  "event_type": "run.failed",
+  "timestamp": "2026-11-21T12:00:00.004000Z",
+  "source": "forked.recorder",
+  "capture_status": "captured",
+  "payload": {"reason": "LookupError: no rate for USD/XYZ"},
+  "redacted_paths": []
+}

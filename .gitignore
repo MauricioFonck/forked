@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.hypothesis/
+.coverage
+htmlcov/
+
+# FORKED local stores (runs may contain sensitive data even after redaction)
+.forked/
+*.forked/
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Obsidian per-user state (the vault config itself is shared)
+contexto/.obsidian/workspace*.json
+
+# Secrets — never commit
+.env
+.env.*
+!.env.example

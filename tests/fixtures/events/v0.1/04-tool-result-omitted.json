@@ -1,0 +1,14 @@
+{
+  "schema_version": "0.1.0",
+  "event_id": "evt_00000000000000000000000000000004",
+  "run_id": "run_00000000000000000000000000000001",
+  "sequence": 3,
+  "event_type": "tool.result",
+  "timestamp": "2026-11-21T12:00:00.003000Z",
+  "source": "forked.sdk",
+  "capture_status": "omitted",
+  "payload_digest": "sha256:0f1e2d3c4b5a69788796a5b4c3d2e1f00f1e2d3c4b5a69788796a5b4c3d2e1f0",
+  "redacted_paths": [],
+  "tool_name": "search_policy",
+  "effect_class": "pure_local"
+}

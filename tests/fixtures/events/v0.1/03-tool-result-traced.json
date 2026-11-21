@@ -1,0 +1,17 @@
+{
+  "schema_version": "0.1.0",
+  "event_id": "evt_00000000000000000000000000000003",
+  "run_id": "run_00000000000000000000000000000001",
+  "sequence": 2,
+  "event_type": "tool.result",
+  "timestamp": "2026-11-21T12:00:00.002000Z",
+  "source": "forked.sdk",
+  "capture_status": "captured",
+  "payload": {"output": 0.92},
+  "redacted_paths": [],
+  "tool_name": "get_exchange_rate",
+  "effect_class": "external_read",
+  "parent_event_id": "evt_00000000000000000000000000000002",
+  "trace_id": "0af7651916cd43dd8448eb211c80319c",
+  "span_id": "b7ad6b7169203331"
+}
