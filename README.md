@@ -27,8 +27,8 @@ default-deny policy, and get an evidence report that says what was held constant
 changed, and **what remains unknown**.
 
 > **Status — honest version.** Pre-alpha. **Recording, inspection, replay, branching with one
-> intervention, default-deny effects and baseline-vs-branch comparison work and are tested** on
-> a toy workflow. The evidence package (Phase 4) is designed but not implemented. Nothing here is scientifically validated yet. See [roadmap](#roadmap).
+> intervention, default-deny effects, baseline-vs-branch comparison and offline-verifiable
+> evidence packages work and are tested** on a toy workflow. No framework adapter yet. Nothing here is scientifically validated yet. See [roadmap](#roadmap).
 
 ## 60-second demo
 
@@ -58,6 +58,8 @@ uv run forked inspect <run_id> --json --strict   # machine-readable; exit 1 if e
 uv run forked replay <run_id>             # re-run the workflow from the recording: 0 tools execute
 uv run forked branch <run_id> --at 3 --value 0.5   # fork: replace the exchange-rate result
 uv run forked compare <run_id> <branch_id> --json  # steps, outcome diff, invariants, claim level
+uv run forked export <run_id> <branch_id> --out evidence/   # manifest + SHA-256 of every artifact
+uv run forked verify evidence/                     # offline; exit 1 on tampering or inflated claims
 ```
 
 ```text
@@ -97,6 +99,14 @@ the new email above is **denied, not sent, and not faked**. `compare` marks ever
 `verified`, `violated` or `unknown` (missing evidence is never `verified`) and only reaches
 `controlled_comparison` when all are verified; it never emits a causal claim.
 
+`export` writes a deterministic evidence package (same runs, same bytes) and refuses to
+include anything shaped like a credential. `verify` needs **only the package** and answers
+two separate questions: *integrity* (every file matches its SHA-256, nothing missing, nothing
+extra) and *validity* (it recomputes the comparison from the packaged runs; a manifest that
+claims more than the evidence supports — say, `conditional_causal`, or an invariant marked
+`verified` that recomputes as `violated` — fails as an **unsupported claim**). The manifest is
+not signed: compare its `package_digest` with a copy you obtained another way.
+
 ## Why this is different
 
 | | Plain logs / tracing | Framework time-travel | **FORKED** |
@@ -106,7 +116,7 @@ the new email above is **denied, not sent, and not faked**. `compare` marks ever
 | Classifies side effects | ❌ | app-specific | ✅ CIP effect taxonomy, default-deny policy |
 | Branch with a declared intervention | ❌ | ✅ (one framework) | ✅ framework-neutral (SDK) |
 | Invariants as `verified / violated / unknown` | ❌ | ❌ | ✅ |
-| Portable, offline-verifiable evidence | ❌ | ❌ | 🛠 Phase 4 |
+| Portable, offline-verifiable evidence | ❌ | ❌ | ✅ |
 
 FORKED **complements** OpenTelemetry, LangGraph, Temporal, Phoenix and LangSmith — it does
 not replace them. See the scoped [competitive landscape](docs/03-competitive-landscape.md).
@@ -129,8 +139,8 @@ bytes did not change — not that a conclusion is true.
 | 1 | Local recorder, redaction, JSONL store, inspector, CLI | ✅ done |
 | 2 | Replay of recorded observations, fail closed, no tool executes | ✅ done |
 | 3 | Branch lineage, one intervention type, default-deny effect policy, invariants, comparison | ✅ done |
-| 4 | Evidence package (SHA-256 manifest) + offline verifier | 🛠 next |
-| 5 | OpenTelemetry bridge, first framework adapter, FCRB benchmark | planned |
+| 4 | Evidence package (SHA-256 manifest) + offline verifier | ✅ done |
+| 5 | OpenTelemetry bridge, first framework adapter, FCRB benchmark | 🛠 next |
 | 6 | Public alpha, docs site, community | planned |
 
 Details and exit criteria: [`docs/09-roadmap-and-backlog.md`](docs/09-roadmap-and-backlog.md).

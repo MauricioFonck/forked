@@ -59,3 +59,9 @@ class IdGenerator(Protocol):
 
 class EnvironmentProbe(Protocol):
     def fingerprint(self, capabilities: AdapterCapabilities) -> EnvironmentFingerprint: ...
+
+
+class ArtifactReader(Protocol):
+    """Raw bytes of a run's stored artifacts, keyed by file name (for evidence export)."""
+
+    def raw_files(self, run_id: RunId) -> dict[str, bytes]: ...

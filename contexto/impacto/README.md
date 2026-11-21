@@ -42,6 +42,7 @@ experimento (un secreto que vuelve a disco, un run parcial que se reporta comple
 
 | Fecha | Cambio | Comportamientos tocados | Resultado |
 |---|---|---|---|
+| 2026-11-21 | [Fase 4: paquete de evidencia y verificador offline](2026-11-21-d-fase-4-evidencia.md) | CP-001…CP-032 (sin regresión) · CP-033…CP-039 (nuevos) | Verificado: 178 tests + ruff + mypy strict; 8 mutaciones detectadas |
 | 2026-11-21 | [Fase 3: ramas, intervención, política y comparación](2026-11-21-c-fase-3-ramas.md) | CP-001…CP-025 (sin regresión) · CP-026…CP-032 (nuevos) | Verificado: 155 tests + ruff + mypy strict; 6 mutaciones detectadas (1 tras un test nuevo) |
 | 2026-11-21 | [Publicación en GitHub y Fase 2 (replay)](2026-11-21-b-publicacion-y-fase-2.md) | CP-001…CP-021 (sin regresión) · CP-022…CP-025 (nuevos) | Verificado: 138 tests + ruff + mypy strict; 3 mutaciones de replay detectadas |
 | 2026-11-21 | [Arranque: Fase 0 (cimientos) y Fase 1 (grabador local)](2026-11-21-arranque-fase-0-y-1.md) | CP-001…CP-021 (todos nuevos) | Verificado: 123 tests + ruff + mypy strict en verde; 11 mutaciones detectadas |

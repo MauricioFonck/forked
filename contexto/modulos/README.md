@@ -13,7 +13,7 @@ Cada contexto acotado de [`docs/05`](../../docs/05-architecture.md) §5.5 es un 
 | Replay | [replay](replay/README.md) | Cursor de observaciones y replay estricto; nunca ejecuta herramientas | ✅ implementado | 2 |
 | Branches & Interventions | [branches](branches/README.md) | Linaje inmutable, checkpoint, una intervención, resolución por política | ✅ implementado | 3 |
 | Comparison & Invariants | [branches](branches/README.md) (misma página) | Diferencias por paso y de resultado, 5 invariantes, nivel de afirmación | ✅ implementado | 3 |
-| Evidence | — | Manifiestos, hashes, exportación y verificación offline | ⏳ | 4 |
+| Evidence | [evidence](evidence/README.md) | Manifiestos, hashes, exportación y verificación offline | ✅ implementado | 4 |
 | Integrations | — | Contratos de adaptador e integraciones concretas (OTel, frameworks) | ⏳ | 5 |
 | Interfaces | dentro de [runs](runs/README.md#cli) | CLI hoy; UI/API después | ✅ CLI | 1 |
 

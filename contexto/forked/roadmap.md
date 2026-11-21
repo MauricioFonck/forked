@@ -13,7 +13,7 @@
 | 1 · Grabador | Modelos `Run`/`Event`, JSONL, validación de secuencia, redacción, adaptador de juguete, `record`/`inspect` | Grabar e inspeccionar offline; eventos malformados fallan claro; redacción probada | ✅ 2026-11-21 ([spec 002](../docs/superpowers/specs/002-grabador-local/spec.md)) |
 | 2 · Replay | Búsqueda de observaciones, contexto de replay, sustitución de resultados, fallo cerrado, sin camino de escritura | El demo reproduce la salida grabada; un test prueba que el adaptador de escritura no se invocó | ✅ 2026-11-21 ([spec 003](../docs/superpowers/specs/003-replay-de-observaciones/spec.md)); la política de efectos pasa a la Fase 3 ([ADR-010](decisiones-arquitectura/ADR-010-replay-estricto-sin-politica.md)) |
 | 3 · Ramas | Linaje inmutable, una intervención, stream por rama, comparación, invariantes | Padre intacto; intervención en la evidencia; desconocido nunca se marca verificado | ✅ 2026-11-21 ([spec 004](../docs/superpowers/specs/004-ramas-e-intervencion/spec.md)) |
-| 4 · Evidencia | Manifiesto, SHA-256, exportación determinista, verificador offline | Detecta artefactos cambiados/faltantes; separa integridad de validez | ⏳ |
+| 4 · Evidencia | Manifiesto, SHA-256, exportación determinista, verificador offline | Detecta artefactos cambiados/faltantes; separa integridad de validez | ✅ 2026-11-21 ([spec 005](../docs/superpowers/specs/005-paquete-de-evidencia/spec.md)) |
 | 5 · Adaptador y benchmark | Puente OTel, un adaptador de framework, escenarios FCRB, runner reproducible | Un caso end-to-end documentado; reproducción independiente | ⏳ |
 | 6 · Alfa pública | Sitio de docs, repo de ejemplo, plantillas, notas de versión, feedback | — | ⏳ (adelantado: CONTRIBUTING, SECURITY, plantillas de issues y PR) |
 

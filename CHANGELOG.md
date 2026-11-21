@@ -38,7 +38,16 @@ Versioning: [SemVer](https://semver.org/) for the package; the CIP schema is ver
   - `forked compare BASELINE BRANCH [--json]`: per-step diff, outcome changes, five
     invariants (`verified`/`violated`/`unknown`), claim level (`observational` or
     `controlled_comparison`; never causal), missing evidence.
+- Phase 4: evidence packages.
+  - `forked export BASE BRANCH --out DIR`: deterministic `forked-evidence/1` package —
+    `manifest.json` (experiment, environment, policy, invariants, claim, limitations, missing
+    evidence, SHA-256 + size of every artifact), `comparison.json`, byte-for-byte run files.
+    Refuses non-empty targets, unsafe paths and credential-shaped values.
+  - `forked verify DIR [--json]`: offline, needs only the package. Reports integrity
+    (changed / missing / unexpected files, manifest problems) separately from validity
+    (comparison recomputed from the packaged runs; inflated or mismatched claims are
+    `unsupported`). Rejects symlinks. Exit 1 if either fails.
 
 ### Not implemented yet
-- Evidence package export/verification (Phase 4); user-approved effect policies; more
-  intervention types.
+- Framework adapters, OpenTelemetry bridge, FCRB benchmark (Phase 5); user-approved effect
+  policies; more intervention types; signed manifests.

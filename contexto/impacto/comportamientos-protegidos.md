@@ -68,3 +68,15 @@
 | CP-030 | Evidencia faltante o rama no finalizada ⇒ invariante `unknown`, nunca `verified`; padre alterado ⇒ `violated` | `test_incomplete_branch_leaves_invariants_unknown_never_verified` · `test_tampered_parent_violates_invariant_and_downgrades_claim` · mutaciones (1 y 1) | CIP §6.6 |
 | CP-031 | `controlled_comparison` solo con todas las invariantes verificadas y rama completa; nunca se emite una afirmación causal | mismos tests · mutación (2 rojos) | CIP §6.7 · `CLAUDE.md` |
 | CP-032 | Checkpoint que no es un `tool.call` ⇒ `InvalidCheckpoint` **antes** de crear el run de la rama | `test_checkpoint_must_be_a_tool_call` · `test_cli.py::test_branch_rejects_bad_value_and_bad_checkpoint` | ADR-011 |
+
+## Paquete de evidencia
+
+| Id | Comportamiento | Red de seguridad | Origen |
+|---|---|---|---|
+| CP-033 | Exportar dos veces los mismos runs produce **los mismos bytes** | `test_evidence.py::test_export_is_deterministic` | `docs/09` Fase 4 |
+| CP-034 | El verificador solo necesita el paquete (store borrado) | `test_exported_package_verifies_without_the_store` · smoke de CI | `docs/08` portabilidad · [ADR-012](../forked/decisiones-arquitectura/ADR-012-paquete-de-evidencia.md) |
+| CP-035 | Archivo alterado, faltante o extra ⇒ integridad `FAILED` y la validez **no se evalúa** | `test_changed_artifact_fails_integrity_and_skips_validity` · `test_missing_and_unexpected_files_are_reported` · mutaciones (2 y 1) | `docs/09` Fase 4 |
+| CP-036 | Integridad y validez son preguntas separadas: un manifiesto que afirma más que la evidencia (causal, o invariante `verified` que recalcula distinto) es `unsupported claim` aunque los hashes cuadren | `test_inflated_claim_with_intact_hashes_is_unsupported` · `test_rehashed_tampering_is_caught_by_recomputation` · mutaciones (2 y 2) | `docs/04` UC-05 |
+| CP-037 | Manifiesto ilegible, faltante, de otro formato/versión, con rutas inseguras o duplicadas ⇒ integridad `FAILED` | `test_bad_manifest_fails_integrity` (5) · `test_unparseable_or_missing_manifest` · mutación (1) | `docs/07` manifiestos alterados |
+| CP-038 | Rutas inseguras y symlinks se rechazan **antes** de resolver nada; nunca se escribe sobre un directorio con contenido | `test_unsafe_artifact_paths_are_refused` (7) · `test_symlink_in_package_is_rejected` (Linux/macOS) · `test_export_refuses_non_empty_target` · mutaciones (7 y 1) | `docs/07` path traversal · [E-001](../errores/errores/E-001-el-guardian-del-grafo-no-veia-mayusculas-en-windows.md) |
+| CP-039 | Un valor con forma de credencial bloquea la exportación | `test_credential_shaped_value_blocks_export` · mutación (1) | `docs/04` UC-05 «excluye secretos» |

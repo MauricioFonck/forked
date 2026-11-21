@@ -3,7 +3,6 @@
 Exit codes: 0 ok · 1 ``--strict`` found missing evidence · 2 a FORKED error occurred.
 """
 
-import dataclasses
 import json
 from pathlib import Path
 from typing import Annotated, Any
@@ -12,13 +11,12 @@ import typer
 
 from forked import __version__
 from forked.application.queries.inspect_run import RunReport
-from forked.bootstrap.container import Application, build_application
+from forked.bootstrap.container import Application, build_application, verify_package
 from forked.demo.toy_agent import CAPABILITIES, run_toy_agent
 from forked.domain.branches.branch import Intervention
 from forked.domain.comparison.compare import Comparison
 from forked.domain.shared.errors import ForkedError
 from forked.domain.shared.identifiers import RunId
-from forked.domain.shared.schema import EVENT_SCHEMA_VERSION
 
 app = typer.Typer(
     help="FORKED — record, inspect and (soon) branch instrumented executions. Local-first.",
@@ -170,24 +168,6 @@ def replay(
     _print_report(report, show_events=False)
 
 
-def comparison_to_dict(c: Comparison) -> dict[str, Any]:
-    return {
-        "cip_version": EVENT_SCHEMA_VERSION,
-        "baseline": c.baseline_id,
-        "branch": c.branch_id,
-        "branch_status": c.branch_status.value,
-        "intervention": c.intervention,
-        "steps": [dataclasses.asdict(s) for s in c.steps],
-        "outcome_changes": [
-            {"field": k, "baseline": a, "branch": b} for k, a, b in c.outcome_changes
-        ],
-        "invariants": [{**dataclasses.asdict(i), "status": i.status.value} for i in c.invariants],
-        "claim_level": c.claim_level.value,
-        "statement": c.statement,
-        "missing_evidence": list(c.missing_evidence),
-    }
-
-
 @app.command()
 def branch(
     run_id: Annotated[str, typer.Argument(help="Parent run to fork.")],
@@ -239,7 +219,7 @@ def compare(
     except ForkedError as exc:
         raise _fail(exc) from exc
     if as_json:
-        typer.echo(json.dumps(comparison_to_dict(comparison), indent=2))
+        typer.echo(json.dumps(comparison.as_dict(), indent=2))
     else:
         _print_comparison(comparison)
 
@@ -260,6 +240,73 @@ def _print_comparison(c: Comparison) -> None:
     typer.echo(f"statement  {c.statement}")
     for item in c.missing_evidence:
         typer.echo(f"missing    {item}")
+
+
+@app.command()
+def export(
+    baseline: Annotated[str, typer.Argument(help="Baseline (parent) run.")],
+    branch_id: Annotated[str, typer.Argument(metavar="BRANCH", help="Branch of the baseline.")],
+    out: Annotated[Path, typer.Option("--out", help="New or empty directory for the package.")],
+    store: StoreOption = DEFAULT_STORE,
+) -> None:
+    """Export a baseline+branch evidence package (manifest with SHA-256 of every artifact)."""
+    try:
+        files = _app(store).export_evidence(RunId(baseline), RunId(branch_id), out)
+    except ForkedError as exc:
+        raise _fail(exc) from exc
+    typer.echo(f"exported {len(files)} files to {out}")
+    for path in sorted(files):
+        typer.echo(f"  {path}")
+
+
+@app.command()
+def verify(
+    package: Annotated[Path, typer.Argument(help="Evidence package directory.")],
+    as_json: Annotated[bool, typer.Option("--json", help="Machine-readable output.")] = False,
+) -> None:
+    """Verify a package offline. Exit 0 only if integrity holds and every claim is supported."""
+    try:
+        report = verify_package(package)
+    except ForkedError as exc:
+        raise _fail(exc) from exc
+    integrity, validity = report.integrity, report.validity
+    findings = {
+        "changed": list(integrity.changed),
+        "missing": list(integrity.missing),
+        "unexpected": list(integrity.unexpected),
+        "problems": list(integrity.problems),
+    }
+    data = {
+        "ok": report.ok,
+        "package_digest": integrity.package_digest,
+        "integrity": {"ok": integrity.ok, **findings},
+        "validity": {
+            "evaluated": validity.evaluated,
+            "claim_level": validity.claim_level,
+            "invariants": dict(validity.invariants),
+            "problems": list(validity.problems),
+            "note": validity.note,
+        },
+    }
+    if as_json:
+        typer.echo(json.dumps(data, indent=2))
+    else:
+        typer.echo(f"package    {package}")
+        typer.echo(f"digest     {integrity.package_digest}")
+        typer.echo(f"integrity  {'ok' if integrity.ok else 'FAILED'}")
+        for kind, items in findings.items():
+            for item in items:
+                typer.echo(f"  {kind}: {item}")
+        typer.echo(
+            f"validity   {'not evaluated' if not validity.evaluated else validity.claim_level}"
+        )
+        for inv, status in validity.invariants:
+            typer.echo(f"  {status:<8} {inv}")
+        for problem in validity.problems:
+            typer.echo(f"  problem: {problem}")
+        typer.echo(f"note       {validity.note}")
+    if not report.ok:
+        raise typer.Exit(code=1)
 
 
 @app.command()

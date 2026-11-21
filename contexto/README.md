@@ -77,6 +77,7 @@ Antes de cambiar algo se escribe su [impacto](impacto/README.md); al cerrar, su 
 | **Persistencia** (JSONL, `run.json`) | [Contexto `runs`](modulos/runs/README.md#persistencia) · [ADR-004](forked/decisiones-arquitectura/ADR-004-persistencia-fase-1.md) | Una línea truncada o malformada falla cerrada con su número de línea; nunca se salta (CP-012) |
 | **El esquema del evento** | [Versionado](protocolo/versionado.md) · [`spec/cip/v0.1/`](../spec/cip/v0.1/event.schema.json) | Regenerar con `scripts/export_schemas.py`; **nunca** editar un fixture dorado publicado (CP-016) |
 | **Replay** | [Contexto `replay`](modulos/replay/README.md) · [ADR-010](forked/decisiones-arquitectura/ADR-010-replay-estricto-sin-politica.md) · [Spec 003](docs/superpowers/specs/003-replay-de-observaciones/spec.md) | En replay `call_tool` **no tiene camino** hacia `fn`; toda duda falla cerrado (CP-022…025) |
+| **Paquete de evidencia** | [Contexto `evidence`](modulos/evidence/README.md) · [Formato](protocolo/paquete-de-evidencia.md) · [ADR-012](forked/decisiones-arquitectura/ADR-012-paquete-de-evidencia.md) | Integridad y validez nunca se mezclan; rutas y symlinks se rechazan antes de resolver (CP-036, CP-038) |
 | **Ramas, intervención y comparación** | [Contexto `branches`](modulos/branches/README.md) · [ADR-011](forked/decisiones-arquitectura/ADR-011-ramas-checkpoint-y-comparacion.md) · [Spec 004](docs/superpowers/specs/004-ramas-e-intervencion/spec.md) | Lo desconocido es `unknown`, nunca `verified`; jamás se emite afirmación causal (CP-030, CP-031) |
 | **Efectos y política** | [Taxonomía de efectos](protocolo/taxonomia-de-efectos.md) · [Contexto `effects`](modulos/effects/README.md) · [Spec 003](docs/superpowers/specs/003-replay-de-observaciones/spec.md) | `SIMULATE` jamás se reporta como resultado real; lo desconocido se deniega |
 | **Un puerto o adaptador nuevo** | [Arquitectura](forked/arquitectura.md) · [Convenciones](forked/convenciones.md) | El doble de test pasa **el mismo** contrato que el adaptador real (CP-020) |
@@ -116,6 +117,7 @@ Son módulos lógicos de **un solo paquete**, no servicios. Solo existe carpeta 
 | [runs](modulos/runs/README.md) | Ciclo de vida del run, sobre de evento, secuencia, redacción, completitud, persistencia, SDK y CLI | ✅ Fase 1 | `domain/runs/`, `application/`, `adapters/` |
 | [effects](modulos/effects/README.md) | Taxonomía de efectos y política default-deny | ✅ Fase 3 | `domain/effects/` |
 | [branches](modulos/branches/README.md) | Ramas, intervención, comparación e invariantes | ✅ Fase 3 | `domain/branches/`, `domain/comparison/` |
+| [evidence](modulos/evidence/README.md) | Exportar y verificar paquetes de evidencia | ✅ Fase 4 | `domain/evidence/` |
 | [replay](modulos/replay/README.md) | Resolver observaciones grabadas; fallar cerrado | ✅ Fase 2 | `domain/replay/` |
 | branches | Linaje inmutable e intervenciones | ⏳ Fase 3 | — |
 | comparison | Invariantes `verified/violated/unknown` y diferencias | ⏳ Fase 3 | — |

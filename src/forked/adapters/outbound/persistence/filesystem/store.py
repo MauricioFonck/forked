@@ -133,3 +133,15 @@ class FileSystemRunStore:
             except InvalidIdentifier:
                 continue
         return sorted(ids, key=lambda run_id: run_id.value)
+
+    # -- ArtifactReader ----------------------------------------------------------------
+
+    def raw_files(self, run_id: RunId) -> dict[str, bytes]:
+        directory = self._run_dir(run_id)
+        try:
+            files = {name: (directory / name).read_bytes() for name in (EVENTS_FILE, RUN_FILE)}
+        except FileNotFoundError as exc:
+            raise RunNotFound(f"run {run_id} is missing {Path(exc.filename).name}") from exc
+        except OSError as exc:
+            raise StorageFailure(f"cannot read run artifacts: {exc}") from exc
+        return files

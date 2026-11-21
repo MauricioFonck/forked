@@ -7,14 +7,21 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from forked.adapters.inbound.sdk.recorder import Recorder
+from forked.adapters.outbound.evidence.directory import read_package, write_package
 from forked.adapters.outbound.persistence.filesystem.store import FileSystemRunStore
 from forked.adapters.outbound.system.runtime import PlatformProbe, RandomIdGenerator, SystemClock
 from forked.application.capture import CaptureLimits, CapturePipeline
+from forked.application.commands.evidence import (
+    ExportEvidence,
+    VerificationReport,
+    verify_evidence,
+)
 from forked.application.commands.record_run import RecordingDependencies, RecordingService
 from forked.application.commands.replay_run import ReplayService
 from forked.application.ports import Clock, IdGenerator
 from forked.application.queries.inspect_run import CompareRuns, InspectRun, ListRuns
 from forked.domain.runs.redaction import RedactionPolicy
+from forked.domain.shared.identifiers import RunId
 
 
 @dataclass(frozen=True, slots=True)
@@ -24,6 +31,12 @@ class Application:
     inspect_run: InspectRun
     list_runs: ListRuns
     compare_runs: CompareRuns
+    export: ExportEvidence
+
+    def export_evidence(self, baseline: RunId, branch: RunId, out: Path) -> dict[str, bytes]:
+        files = self.export.execute(baseline, branch)
+        write_package(out, files)
+        return files
 
 
 def build_application(
@@ -46,10 +59,20 @@ def build_application(
         limits=effective_limits,
     )
     recording = RecordingService(deps)
+    inspect = InspectRun(store, store)
+    compare = CompareRuns(store, store)
     return Application(
         store_root=store_root,
         recorder=Recorder(recording, ReplayService(recording, store, store)),
-        inspect_run=InspectRun(store, store),
+        inspect_run=inspect,
         list_runs=ListRuns(store),
-        compare_runs=CompareRuns(store, store),
+        compare_runs=compare,
+        export=ExportEvidence(inspect, compare, store, redaction or RedactionPolicy()),
     )
+
+
+def verify_package(package: Path) -> VerificationReport:
+    """Verify an evidence package offline. Needs nothing but the package directory."""
+    files = read_package(package)
+    view = FileSystemRunStore(package)  # the package's runs/ has the store layout; read-only use
+    return verify_evidence(files, CompareRuns(view, view))

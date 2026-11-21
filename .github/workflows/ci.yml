@@ -47,4 +47,8 @@ jobs:
           uv run forked replay "$RUN_ID"
           uv run forked branch "$RUN_ID" --at 3 --value 0.5 | tee branch.txt
           grep -q "claim      controlled_comparison" branch.txt
+          BRANCH_ID=$(head -1 branch.txt | awk '{print $NF}')
+          uv run forked export "$RUN_ID" "$BRANCH_ID" --out "$RUNNER_TEMP/evidence"
+          uv run forked verify "$RUNNER_TEMP/evidence"
+          rm -rf "$FORKED_STORE/runs" && uv run forked verify "$RUNNER_TEMP/evidence"  # needs only the package
           test "$(ls "$FORKED_STORE/toy-outbox" | wc -l)" -eq 1  # replay and branch sent nothing

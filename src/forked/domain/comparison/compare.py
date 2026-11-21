@@ -11,7 +11,7 @@ Rules (CLAUDE.md, CIP §6.6 and §6.7, ADR-003):
 """
 
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from enum import StrEnum
 
 from forked.domain.branches.branch import log_digest
@@ -22,6 +22,7 @@ from forked.domain.runs.event import Event, EventType
 from forked.domain.runs.run import RunSnapshot, RunStatus
 from forked.domain.shared.canonical import JsonValue
 from forked.domain.shared.errors import DomainError
+from forked.domain.shared.schema import EVENT_SCHEMA_VERSION
 
 
 class NotABranch(DomainError):
@@ -79,6 +80,23 @@ class Comparison:
     claim_level: ClaimLevel
     statement: str
     missing_evidence: tuple[str, ...]
+
+    def as_dict(self) -> dict[str, JsonValue]:
+        return {
+            "cip_version": EVENT_SCHEMA_VERSION,
+            "baseline": self.baseline_id,
+            "branch": self.branch_id,
+            "branch_status": self.branch_status.value,
+            "intervention": self.intervention,
+            "steps": [asdict(s) for s in self.steps],
+            "outcome_changes": [
+                {"field": k, "baseline": a, "branch": b} for k, a, b in self.outcome_changes
+            ],
+            "invariants": [{**asdict(i), "status": i.status.value} for i in self.invariants],
+            "claim_level": self.claim_level.value,
+            "statement": self.statement,
+            "missing_evidence": list(self.missing_evidence),
+        }
 
 
 def _forked(payload: JsonValue) -> dict[str, JsonValue]:

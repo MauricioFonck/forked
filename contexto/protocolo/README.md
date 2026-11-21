@@ -8,8 +8,10 @@
 | Documento | Cubre | Implementado |
 |---|---|---|
 | [Sobre de evento](sobre-de-evento.md) | Cada campo de un evento v0.1.0, reglas y ejemplos | ✅ esquema publicado |
-| [Taxonomía de efectos](taxonomia-de-efectos.md) | Las 6 clases y su política por defecto | 🟡 vocabulario sí, política no |
+| [Taxonomía de efectos](taxonomia-de-efectos.md) | Las 6 clases y su política por defecto | ✅ `default-deny/1` |
 | [Versionado](versionado.md) | SemVer del esquema, compatibilidad y fixtures dorados | ✅ |
+| [Paquete de evidencia](paquete-de-evidencia.md) | Formato `forked-evidence/1`: archivos, manifiesto, verificación | ✅ |
 
-Pendiente de diseñar (abiertas en [`docs/12`](../../docs/12-decisions-and-open-questions.md) §12.2): manifiesto del
-experimento, checkpoints portables, intervenciones, invariantes y paquete de evidencia.
+Resuelto para el SDK: checkpoint e intervención ([ADR-011](../forked/decisiones-arquitectura/ADR-011-ramas-checkpoint-y-comparacion.md)),
+paquete de evidencia ([ADR-012](../forked/decisiones-arquitectura/ADR-012-paquete-de-evidencia.md)). Abierto: checkpoints
+portables entre frameworks e intervenciones adicionales (`docs/12` §12.2).

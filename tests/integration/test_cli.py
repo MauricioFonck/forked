@@ -128,3 +128,32 @@ def test_branch_rejects_bad_value_and_bad_checkpoint(tmp_path: Path) -> None:
     )
     assert bad_at.exit_code == 2
     assert "error[invalid_checkpoint]" in bad_at.output
+
+
+def test_export_and_verify_exit_codes(tmp_path: Path) -> None:
+    store, pkg = tmp_path / "store", tmp_path / "pkg"
+    run_id = _record(store)
+    out = runner.invoke(
+        app, ["branch", run_id, "--at", "3", "--value", "0.5", "--store", str(store)]
+    )
+    branch_id = re.search(r"as (run_[0-9a-f]+)", out.output).group(1)  # type: ignore[union-attr]
+
+    exported = runner.invoke(
+        app, ["export", run_id, branch_id, "--out", str(pkg), "--store", str(store)]
+    )
+    assert exported.exit_code == 0, exported.output
+    assert "manifest.json" in exported.output
+
+    ok = runner.invoke(app, ["verify", str(pkg), "--json"])
+    assert ok.exit_code == 0, ok.output
+    assert json.loads(ok.output)["validity"]["claim_level"] == "controlled_comparison"
+
+    (pkg / "comparison.json").write_text("{}", encoding="utf-8")
+    tampered = runner.invoke(app, ["verify", str(pkg)])
+    assert tampered.exit_code == 1
+    assert "integrity  FAILED" in tampered.output
+    assert "changed: comparison.json" in tampered.output
+
+    missing = runner.invoke(app, ["verify", str(tmp_path / "nope")])
+    assert missing.exit_code == 2
+    assert "error[storage_failure]" in missing.output
