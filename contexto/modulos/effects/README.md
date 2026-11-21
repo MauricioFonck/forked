@@ -14,7 +14,9 @@ simula de forma **declarada** o se deniega.
 |---|---|---|
 | Taxonomía `EffectClass` (6 clases del CIP) | ✅ | `domain/effects/effect_class.py` |
 | Declarar la clase en cada evento de herramienta | ✅ | `RecordedRun.call_tool(nombre, efecto, …)` |
-| Política (`ALLOW` · `REPLAY` · `SIMULATE` · `DENY`) con versión, motivo y evento de auditoría | ⏳ Fase 2 | [spec 003](../../docs/superpowers/specs/003-replay-de-observaciones/spec.md) |
+| Política `DefaultDenyPolicy` (`default-deny/1`): `ALLOW` solo `pure_local`, el resto `DENY` | ✅ Fase 3 | `domain/effects/policy.py` · [ADR-011](../../forked/decisiones-arquitectura/ADR-011-ramas-checkpoint-y-comparacion.md) |
+| Decisión y motivo en cada resultado (`payload.forked`) como auditoría | ✅ Fase 3 | `adapters/inbound/sdk/recorder.py` |
+| `SIMULATE` | ❌ no existe (no hay caso de uso; ver ADR-011) | — |
 | Aprobaciones explícitas del usuario | ⏳ | — |
 
 ## Reglas (vigentes desde ya para todo diseño)

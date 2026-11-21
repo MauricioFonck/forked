@@ -13,7 +13,7 @@
 | aplicación | `src/forked/application/commands/replay_run.py` | `ReplayService.start(source, caps)`: verifica adaptador, carga eventos, abre run nuevo con `replay_of` |
 | SDK | `src/forked/adapters/inbound/sdk/recorder.py` | `Recorder.replay(...)`; en replay `call_tool` no llama a `fn`; `RecordedToolError` |
 | CLI | `src/forked/adapters/inbound/cli/app.py` | `forked replay RUN_ID` |
-| demo | `src/forked/demo/toy_agent.py` | `run_toy_agent(..., replay_of=...)`: mismo código de flujo |
+| demo | `src/forked/demo/toy_agent.py` | `run_toy_agent(..., session=recorder.replay(...))`: mismo código de flujo |
 
 ## Reglas (fallo cerrado)
 
@@ -34,7 +34,8 @@ En todos los fallos el run de replay queda `failed` con el motivo (redactado).
 - Reproduce **observaciones**, no el entorno. Azar o reloj fuera de herramientas ⇒ divergencia.
 - Entradas comparadas tras redacción: un secreto distinto no se distingue.
 - `RecordedToolError` no recrea el tipo original de la excepción (solo su nombre).
-- Sin política de efectos: llega en la Fase 3.
+- El replay no consulta la política de efectos: nunca ejecuta nada. La política se usa en las
+  [ramas](../branches/README.md).
 
 ## Comportamientos protegidos
 

@@ -9,10 +9,10 @@ Cada contexto acotado de [`docs/05`](../../docs/05-architecture.md) §5.5 es un 
 | Contexto | README | Responsabilidad | Estado | Fase |
 |---|---|---|---|---|
 | Runs & Capture | [runs](runs/README.md) | Ciclo de vida, sobre de evento, orden, redacción, completitud, persistencia, SDK, CLI | ✅ implementado | 1 |
-| Effects & Safety | [effects](effects/README.md) | Taxonomía de efectos (hecho); política default-deny y aprobaciones (pendiente) | 🟡 parcial | 1–3 |
+| Effects & Safety | [effects](effects/README.md) | Taxonomía de efectos y política default-deny (hecho); aprobaciones del usuario (pendiente) | 🟡 parcial | 1–3 |
 | Replay | [replay](replay/README.md) | Cursor de observaciones y replay estricto; nunca ejecuta herramientas | ✅ implementado | 2 |
-| Branches & Interventions | — | Linaje inmutable, referencias a checkpoint, intervenciones | ⏳ | 3 |
-| Comparison & Invariants | — | Diferencias observadas, evaluación de invariantes, incertidumbre | ⏳ | 3 |
+| Branches & Interventions | [branches](branches/README.md) | Linaje inmutable, checkpoint, una intervención, resolución por política | ✅ implementado | 3 |
+| Comparison & Invariants | [branches](branches/README.md) (misma página) | Diferencias por paso y de resultado, 5 invariantes, nivel de afirmación | ✅ implementado | 3 |
 | Evidence | — | Manifiestos, hashes, exportación y verificación offline | ⏳ | 4 |
 | Integrations | — | Contratos de adaptador e integraciones concretas (OTel, frameworks) | ⏳ | 5 |
 | Interfaces | dentro de [runs](runs/README.md#cli) | CLI hoy; UI/API después | ✅ CLI | 1 |

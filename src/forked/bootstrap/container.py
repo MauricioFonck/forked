@@ -13,7 +13,7 @@ from forked.application.capture import CaptureLimits, CapturePipeline
 from forked.application.commands.record_run import RecordingDependencies, RecordingService
 from forked.application.commands.replay_run import ReplayService
 from forked.application.ports import Clock, IdGenerator
-from forked.application.queries.inspect_run import InspectRun, ListRuns
+from forked.application.queries.inspect_run import CompareRuns, InspectRun, ListRuns
 from forked.domain.runs.redaction import RedactionPolicy
 
 
@@ -23,6 +23,7 @@ class Application:
     recorder: Recorder
     inspect_run: InspectRun
     list_runs: ListRuns
+    compare_runs: CompareRuns
 
 
 def build_application(
@@ -50,4 +51,5 @@ def build_application(
         recorder=Recorder(recording, ReplayService(recording, store, store)),
         inspect_run=InspectRun(store, store),
         list_runs=ListRuns(store),
+        compare_runs=CompareRuns(store, store),
     )

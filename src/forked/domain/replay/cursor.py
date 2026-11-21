@@ -60,27 +60,43 @@ class ReplayCursor:
     def consumed(self) -> int:
         return self.expected - self.remaining
 
-    def resolve(self, call: Event) -> Event:
-        """Return the recorded outcome for ``call`` (the live, already-redacted call)."""
+    @staticmethod
+    def _mismatch(call: Event, recorded: Event) -> str | None:
+        for field in ("tool_name", "effect_class"):
+            live, then = getattr(call, field), getattr(recorded, field)
+            if live != then:
+                return f": {field} is {live!r}, recorded {then!r}"
+        if (call.payload, call.payload_digest) != (recorded.payload, recorded.payload_digest):
+            return f" ({call.tool_name}): inputs differ from the recording"
+        return None
+
+    def match(self, call: Event) -> Observation:
+        """Consume the next recorded call if ``call`` matches it; raise otherwise."""
         position = self.consumed + 1
         if not self._pending:
             raise MissingObservation(
                 f"call #{position} ({call.tool_name}) has no recorded observation in "
                 f"{self.source_run_id} (it recorded {self.expected} calls)"
             )
-        recorded = self._pending[0]
-        for field in ("tool_name", "effect_class"):
-            live, then = getattr(call, field), getattr(recorded.call, field)
-            if live != then:
-                raise ReplayDivergence(f"call #{position}: {field} is {live!r}, recorded {then!r}")
-        if (call.payload, call.payload_digest) != (
-            recorded.call.payload,
-            recorded.call.payload_digest,
-        ):
-            raise ReplayDivergence(
-                f"call #{position} ({call.tool_name}): inputs differ from the recording"
-            )
-        outcome = recorded.outcome
+        problem = self._mismatch(call, self._pending[0].call)
+        if problem:
+            raise ReplayDivergence(f"call #{position}{problem}")
+        return self._pending.popleft()
+
+    def try_resolve(self, call: Event) -> Event | None:
+        """Like ``resolve`` but returns None instead of raising, consuming nothing then."""
+        if not self._pending or self._mismatch(call, self._pending[0].call):
+            return None
+        outcome = self._pending[0].outcome
+        if outcome is None or outcome.capture_status is CaptureStatus.OMITTED:
+            return None
+        self._pending.popleft()
+        return outcome
+
+    def resolve(self, call: Event) -> Event:
+        """Return the recorded outcome for ``call`` (the live, already-redacted call)."""
+        position = self.consumed + 1
+        outcome = self.match(call).outcome
         if outcome is None:
             raise MissingObservation(
                 f"call #{position} ({call.tool_name}) has no recorded result "
@@ -91,5 +107,4 @@ class ReplayCursor:
                 f"call #{position} ({call.tool_name}): recorded result was omitted "
                 "(over the size limit); only its digest exists"
             )
-        self._pending.popleft()
         return outcome

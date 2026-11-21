@@ -3,6 +3,7 @@
 Exit codes: 0 ok · 1 ``--strict`` found missing evidence · 2 a FORKED error occurred.
 """
 
+import dataclasses
 import json
 from pathlib import Path
 from typing import Annotated, Any
@@ -12,9 +13,12 @@ import typer
 from forked import __version__
 from forked.application.queries.inspect_run import RunReport
 from forked.bootstrap.container import Application, build_application
-from forked.demo.toy_agent import run_toy_agent
+from forked.demo.toy_agent import CAPABILITIES, run_toy_agent
+from forked.domain.branches.branch import Intervention
+from forked.domain.comparison.compare import Comparison
 from forked.domain.shared.errors import ForkedError
 from forked.domain.shared.identifiers import RunId
+from forked.domain.shared.schema import EVENT_SCHEMA_VERSION
 
 app = typer.Typer(
     help="FORKED — record, inspect and (soon) branch instrumented executions. Local-first.",
@@ -154,12 +158,108 @@ def replay(
     """
     application = _app(store)
     try:
-        new_id = run_toy_agent(application.recorder, store / "toy-outbox", replay_of=RunId(run_id))
+        new_id = run_toy_agent(
+            application.recorder,
+            store / "toy-outbox",
+            session=application.recorder.replay(RunId(run_id), CAPABILITIES),
+        )
         report = application.inspect_run.execute(new_id)
     except ForkedError as exc:
         raise _fail(exc) from exc
     typer.echo(f"replayed {run_id} as {new_id} (0 tools executed)")
     _print_report(report, show_events=False)
+
+
+def comparison_to_dict(c: Comparison) -> dict[str, Any]:
+    return {
+        "cip_version": EVENT_SCHEMA_VERSION,
+        "baseline": c.baseline_id,
+        "branch": c.branch_id,
+        "branch_status": c.branch_status.value,
+        "intervention": c.intervention,
+        "steps": [dataclasses.asdict(s) for s in c.steps],
+        "outcome_changes": [
+            {"field": k, "baseline": a, "branch": b} for k, a, b in c.outcome_changes
+        ],
+        "invariants": [{**dataclasses.asdict(i), "status": i.status.value} for i in c.invariants],
+        "claim_level": c.claim_level.value,
+        "statement": c.statement,
+        "missing_evidence": list(c.missing_evidence),
+    }
+
+
+@app.command()
+def branch(
+    run_id: Annotated[str, typer.Argument(help="Parent run to fork.")],
+    at: Annotated[
+        int, typer.Option("--at", help="Sequence of a tool.call event (see inspect --events).")
+    ],
+    value: Annotated[
+        str, typer.Option("--value", help="JSON value that replaces that call's result.")
+    ],
+    store: StoreOption = DEFAULT_STORE,
+) -> None:
+    """Fork RUN_ID at a tool call, replace its result, and re-run the toy-agent workflow.
+
+    Calls before the checkpoint replay; later calls replay if unchanged, otherwise only
+    pure_local tools execute and everything else is denied (nothing is sent).
+    """
+    try:
+        replacement = json.loads(value)
+    except json.JSONDecodeError as exc:
+        typer.echo(f"error[invalid_value]: --value is not JSON: {exc}", err=True)
+        raise typer.Exit(code=2) from exc
+    application = _app(store)
+    parent = RunId(run_id)
+    try:
+        new_id = run_toy_agent(
+            application.recorder,
+            store / "toy-outbox",
+            session=application.recorder.branch(
+                parent, CAPABILITIES, Intervention(checkpoint=at, value=replacement)
+            ),
+        )
+        comparison = application.compare_runs.execute(parent, new_id)
+    except ForkedError as exc:
+        raise _fail(exc) from exc
+    typer.echo(f"branched {run_id} at sequence {at} as {new_id}")
+    _print_comparison(comparison)
+
+
+@app.command()
+def compare(
+    baseline: Annotated[str, typer.Argument(help="Baseline (parent) run.")],
+    branch_id: Annotated[str, typer.Argument(metavar="BRANCH", help="Branch of the baseline.")],
+    store: StoreOption = DEFAULT_STORE,
+    as_json: Annotated[bool, typer.Option("--json", help="Machine-readable output.")] = False,
+) -> None:
+    """Compare a baseline with its branch: steps, outcome, invariants, claim level."""
+    try:
+        comparison = _app(store).compare_runs.execute(RunId(baseline), RunId(branch_id))
+    except ForkedError as exc:
+        raise _fail(exc) from exc
+    if as_json:
+        typer.echo(json.dumps(comparison_to_dict(comparison), indent=2))
+    else:
+        _print_comparison(comparison)
+
+
+def _print_comparison(c: Comparison) -> None:
+    typer.echo(f"baseline   {c.baseline_id}")
+    typer.echo(f"branch     {c.branch_id} ({c.branch_status})")
+    typer.echo("steps:")
+    for s in c.steps:
+        typer.echo(f"  #{s.index} {s.tool}: {s.status} [{s.decision}]")
+    typer.echo("outcome changes:")
+    for field, before, after in c.outcome_changes:
+        typer.echo(f"  {field}: {json.dumps(before)} -> {json.dumps(after)}")
+    typer.echo("invariants:")
+    for inv in c.invariants:
+        typer.echo(f"  {inv.status:<8} {inv.id}  ({inv.evidence})")
+    typer.echo(f"claim      {c.claim_level}")
+    typer.echo(f"statement  {c.statement}")
+    for item in c.missing_evidence:
+        typer.echo(f"missing    {item}")
 
 
 @app.command()

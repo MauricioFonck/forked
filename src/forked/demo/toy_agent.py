@@ -13,10 +13,12 @@ Honesty notes (also declared as adapter limitations, so they appear in every rep
 """
 
 import json
+from contextlib import AbstractContextManager
 from pathlib import Path
 
-from forked.adapters.inbound.sdk.recorder import Recorder
+from forked.adapters.inbound.sdk.recorder import RecordedRun, Recorder
 from forked.domain.effects.effect_class import EffectClass
+from forked.domain.effects.policy import EffectDenied
 from forked.domain.runs.capabilities import AdapterCapabilities, tool_capture_point
 from forked.domain.shared.canonical import JsonValue
 from forked.domain.shared.identifiers import RunId
@@ -87,14 +89,13 @@ def run_toy_agent(
     amount: float = 100.0,
     base: str = "USD",
     quote: str = "EUR",
-    replay_of: RunId | None = None,
+    session: AbstractContextManager[RecordedRun] | None = None,
 ) -> RunId:
-    """Record the toy agent once, or replay ``replay_of`` (tools are not executed)."""
+    """Run the toy agent once. ``session`` defaults to recording; pass
+    ``recorder.replay(...)`` or ``recorder.branch(...)`` to run the same code from a recording.
+    """
     send_email = make_send_email(outbox)
-    session = (
-        recorder.replay(replay_of, CAPABILITIES) if replay_of else recorder.record(CAPABILITIES)
-    )
-    with session as run:
+    with session or recorder.record(CAPABILITIES) as run:
         policy = run.call_tool(
             "search_policy", EffectClass.PURE_LOCAL, search_policy, query="currency conversion"
         )
@@ -108,14 +109,18 @@ def run_toy_agent(
         )
         converted = round(amount * rate, 2)
         body = f"{amount:.2f} {base} = {converted:.2f} {quote} (rate {rate}, source: toy stub)."
-        receipt = run.call_tool(
-            "send_email",
-            EffectClass.EXTERNAL_WRITE,
-            send_email,
-            to="finance@example.com",
-            subject=f"Conversion {base}->{quote}",
-            body=body,
-        )
+        receipt: JsonValue
+        try:
+            receipt = run.call_tool(
+                "send_email",
+                EffectClass.EXTERNAL_WRITE,
+                send_email,
+                to="finance@example.com",
+                subject=f"Conversion {base}->{quote}",
+                body=body,
+            )
+        except EffectDenied as denied:  # a branch with a new body may not send email
+            receipt = {"accepted": False, "denied": denied.reason}
         run.set_outcome(
             {"converted": converted, "rate": rate, "policy_hits": len(policy), "email": receipt}
         )

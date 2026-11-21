@@ -39,7 +39,9 @@ def test_replay_reproduces_outcome_without_executing_any_tool(
         monkeypatch.setattr(toy_agent, name, boom)
     monkeypatch.setattr(toy_agent.SendEmail, "__call__", boom)
 
-    replayed = run_toy_agent(app.recorder, outbox, replay_of=source)
+    replayed = run_toy_agent(
+        app.recorder, outbox, session=app.recorder.replay(source, CAPABILITIES)
+    )
 
     assert replayed != source
     assert sorted(p.name for p in outbox.iterdir()) == sent  # external write not repeated
@@ -54,7 +56,12 @@ def test_replay_reproduces_outcome_without_executing_any_tool(
 def test_changed_input_diverges_and_fails_the_replay(app: Application, tmp_path: Path) -> None:
     source = run_toy_agent(app.recorder, tmp_path / "outbox")
     with pytest.raises(ReplayDivergence, match=r"#3 \(send_email\): inputs differ"):
-        run_toy_agent(app.recorder, tmp_path / "outbox", amount=999.0, replay_of=source)
+        run_toy_agent(
+            app.recorder,
+            tmp_path / "outbox",
+            amount=999.0,
+            session=app.recorder.replay(source, CAPABILITIES),
+        )
     failed = app.list_runs.execute()[-1]
     assert failed.status is RunStatus.FAILED
 

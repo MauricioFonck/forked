@@ -110,9 +110,9 @@ class RecordingService:
         self._deps = deps
 
     def start(
-        self, capabilities: AdapterCapabilities, *, replay_of: RunId | None = None
+        self, capabilities: AdapterCapabilities, *, lineage: dict[str, JsonValue] | None = None
     ) -> RecordingSession:
-        """Start a run. ``replay_of`` marks it as a replay of another run in ``run.started``."""
+        """Start a run. ``lineage`` (replay/branch metadata) is merged into ``run.started``."""
         run = Run.start(
             run_id=self._deps.ids.new_run_id(),
             capabilities=capabilities,
@@ -126,7 +126,6 @@ class RecordingService:
             "adapter_version": capabilities.version,
             "limitations": list(capabilities.limitations),
         }
-        if replay_of is not None:
-            started["replay_of"] = replay_of.value
+        started.update(lineage or {})
         session.capture(EventDraft(EventType.RUN_STARTED, RECORDER_SOURCE, started))
         return session

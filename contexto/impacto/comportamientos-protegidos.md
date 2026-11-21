@@ -56,3 +56,15 @@
 | CP-023 | Cualquier diferencia de nombre, clase o entradas redactadas aborta el replay (`ReplayDivergence`) y el run queda `failed` | `test_changed_input_diverges_and_fails_the_replay` · `test_effect_class_change_diverges` · mutación (1) | ADR-010 |
 | CP-024 | Sin observación utilizable (llamada extra, sin resultado, resultado omitido) ⇒ `MissingObservation`, nunca llamada en vivo | `test_extra_call_has_no_observation` · `test_omitted_result_cannot_be_replayed` | `docs/04` UC-02 |
 | CP-025 | Llamadas grabadas no pedidas o run de otro adaptador ⇒ el replay falla | `test_unrequested_recorded_calls_fail_the_replay` · `test_other_adapters_run_cannot_be_replayed` · mutación (1) | ADR-010 |
+
+## Ramas, política y comparación
+
+| Id | Comportamiento | Red de seguridad | Origen |
+|---|---|---|---|
+| CP-026 | Crear una rama y compararla **no modifica ni un byte** de los artefactos del padre | `test_branch.py::test_branch_changes_outcome_denies_write_and_keeps_parent_intact` | `docs/09` Fase 3 · [ADR-011](../forked/decisiones-arquitectura/ADR-011-ramas-checkpoint-y-comparacion.md) |
+| CP-027 | En una rama, una llamada nueva que no sea `pure_local` **no se ejecuta**: `EffectDenied` + `tool.error` con motivo | `test_changed_non_pure_call_after_checkpoint_is_denied` (5 clases) · smoke de CI · mutación (7 rojos) | `docs/07` §7.5 |
+| CP-028 | Antes del checkpoint, y en el checkpoint mismo, la rama exige coincidir con el padre; si no, falla cerrado | `test_prefix_divergence_fails_closed` · `test_checkpoint_call_must_match_parent_inputs` · mutaciones (6 y 1 rojos) | ADR-011 |
+| CP-029 | La intervención y el linaje quedan en `run.started` de la rama, redactados | `test_secret_in_intervention_value_is_redacted` · aserción de `intervention` en el test principal | `docs/09` «la intervención aparece en la evidencia» |
+| CP-030 | Evidencia faltante o rama no finalizada ⇒ invariante `unknown`, nunca `verified`; padre alterado ⇒ `violated` | `test_incomplete_branch_leaves_invariants_unknown_never_verified` · `test_tampered_parent_violates_invariant_and_downgrades_claim` · mutaciones (1 y 1) | CIP §6.6 |
+| CP-031 | `controlled_comparison` solo con todas las invariantes verificadas y rama completa; nunca se emite una afirmación causal | mismos tests · mutación (2 rojos) | CIP §6.7 · `CLAUDE.md` |
+| CP-032 | Checkpoint que no es un `tool.call` ⇒ `InvalidCheckpoint` **antes** de crear el run de la rama | `test_checkpoint_must_be_a_tool_call` · `test_cli.py::test_branch_rejects_bad_value_and_bad_checkpoint` | ADR-011 |

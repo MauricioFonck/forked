@@ -3,7 +3,7 @@
 ↑ [Memoria central](../README.md)
 
 > Documento **vivo**: se actualiza cada vez que una fase avanza. Última revisión: **2026-11-21**
-> ([sesión de publicación y Fase 2](../sesiones/2026-11-21-b-publicacion-y-fase-2.md)).
+> ([sesión de la Fase 3](../sesiones/2026-11-21-c-fase-3-ramas.md)).
 
 ## Resumen
 
@@ -12,8 +12,8 @@
 | 0 | Cimientos del repositorio, CI, políticas OSS, guardianes | ✅ Hecha | [001](../docs/superpowers/specs/001-cimientos-del-repositorio/spec.md) |
 | 1 | Grabador local + inspector + CLI `record`/`inspect`/`runs` | ✅ Hecha | [002](../docs/superpowers/specs/002-grabador-local/spec.md) |
 | 2 | Replay de observaciones grabadas, fallo cerrado | ✅ Hecha | [003](../docs/superpowers/specs/003-replay-de-observaciones/spec.md) |
-| 3 | Ramas, una intervención, política default-deny, invariantes | ⏳ Siguiente | — |
-| 4 | Paquete de evidencia + verificador offline | ⏳ Pendiente | — |
+| 3 | Ramas, una intervención, política default-deny, invariantes, comparación | ✅ Hecha | [004](../docs/superpowers/specs/004-ramas-e-intervencion/spec.md) |
+| 4 | Paquete de evidencia + verificador offline | ⏳ Siguiente | — |
 | 5 | Puente OpenTelemetry, primer adaptador de framework, FCRB | ⏳ Pendiente | — |
 | 6 | Alfa pública y comunidad | ⏳ Pendiente | — |
 
@@ -29,21 +29,26 @@
 - `forked replay <run>` re-ejecuta el flujo contestando cada herramienta con lo grabado: **0 herramientas
   ejecutadas**, outbox intacto, mismo resultado; cualquier divergencia u observación faltante falla cerrado
   ([contexto `replay`](../modulos/replay/README.md)).
-- **138 tests** (unidad, contrato, seguridad, integración, aceptación, guardianes) + ruff + mypy strict en verde, y
-  17 mutaciones dirigidas detectadas. Comandos en las bitácoras
+- `forked branch <run> --at 3 --value 0.5` bifurca en un `tool.call`, reemplaza su resultado y re-ejecuta: antes
+  del checkpoint replay, después replay si no cambió o política default-deny (el email nuevo se **deniega**).
+  `forked compare` da diferencias por paso y de resultado, 5 invariantes y el nivel de afirmación
+  ([contexto `branches`](../modulos/branches/README.md)).
+- **155 tests** (unidad, contrato, seguridad, integración, aceptación, guardianes) + ruff + mypy strict en verde, y
+  23 mutaciones dirigidas detectadas (una sobrevivió y generó un test nuevo, ver la
+  [bitácora de la Fase 3](../sesiones/2026-11-21-c-fase-3-ramas.md#6-cómo-verificar)). Comandos en las bitácoras
   ([Fases 0–1](../sesiones/2026-11-21-arranque-fase-0-y-1.md#6-cómo-verificar),
   [Fase 2](../sesiones/2026-11-21-b-publicacion-y-fase-2.md#6-cómo-verificar)).
 - Repositorio público en GitHub (`MauricioFonck/forked`), CI en verde en Linux 3.11–3.14, Windows y macOS.
 
 ## Qué NO funciona todavía
 
-- No hay ramas, intervenciones, invariantes, comparación ni paquete de evidencia.
-- La política de efectos no existe: la clase de efecto se **declara, registra y se compara en replay**; decidir
-  `allow/deny` llega con las ramas ([ADR-010](decisiones-arquitectura/ADR-010-replay-estricto-sin-politica.md)).
+- No hay paquete de evidencia exportable ni verificador offline (Fase 4).
+- Una sola intervención (`replace_recorded_observation`) y una sola política (`default-deny/1`), sin
+  aprobaciones del usuario.
 - No hay índice SQLite: listar runs recorre el directorio ([ADR-004](decisiones-arquitectura/ADR-004-persistencia-fase-1.md)).
 
 ## Próximo paso
 
-Fase 3: spec 004 (ramas e intervención). Bloqueo abierto: definir qué es un checkpoint portable (`docs/12` §12.2.2,
-[revisión](../revisiones/2026-11-21-revision-de-preparacion.md)). Propuesta: checkpoint = índice de secuencia en el
-log; la rama re-ejecuta en replay hasta ese índice y aplica la intervención después.
+Fase 4: paquete de evidencia (manifiesto con SHA-256 de cada artefacto, versión de esquema, entorno, política) y
+verificador offline que separa integridad de validez. Sustituye el digest semántico de `inv_parent_unchanged` por hashes
+de archivo ([ADR-011](decisiones-arquitectura/ADR-011-ramas-checkpoint-y-comparacion.md)).

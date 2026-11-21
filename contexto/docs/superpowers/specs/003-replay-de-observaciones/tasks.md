@@ -9,4 +9,4 @@
 - [x] T5 · Tests de aceptación (8) y CLI (2)
 - [x] T6 · Mutaciones (3/3 detectadas), ruff, mypy, pytest
 - [x] T7 · ADR-010, contexto `replay`, CP-022…025, README y CHANGELOG
-- [ ] T8 · Política de efectos `allow/deny/simulate` → Fase 3 (spec 004)
+- [x] T8 · Política de efectos → hecha en la Fase 3 ([spec 004](../004-ramas-e-intervencion/spec.md))

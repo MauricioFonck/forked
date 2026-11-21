@@ -10,10 +10,17 @@ Example::
     with recorder.replay(run_id, capabilities) as run:    # replay: tools never execute
         ...same workflow code...
 
+    with recorder.branch(run_id, capabilities, Intervention(checkpoint=3, value=0.5)) as run:
+        ...same workflow code...                          # fork with one declared change
+
 During **recording** the SDK only observes inputs, outputs and errors. During **replay**
 ``fn`` is never called, whatever its effect class: each call returns the recorded
 output (or re-raises the recorded error as ``RecordedToolError``). A call the recording
-cannot answer fails closed.
+cannot answer fails closed. In a **branch**, calls before the checkpoint replay, the
+checkpoint call gets the intervention value, and later calls replay if they match the
+parent or go to the default-deny effect policy: only ``pure_local`` executes, anything
+else raises ``EffectDenied`` (recorded as a ``tool.error``) without executing.
+Every outcome in replay/branch mode carries ``payload.forked = {decision, reason}``.
 """
 
 from collections.abc import Callable, Iterator
@@ -22,10 +29,12 @@ from typing import TypeVar, cast
 
 from forked.application.commands.record_run import RecordingService, RecordingSession
 from forked.application.commands.replay_run import ReplayService
+from forked.domain.branches.branch import Intervention, Resolution
 from forked.domain.effects.effect_class import EffectClass
+from forked.domain.effects.policy import Decision, EffectDenied
 from forked.domain.replay.cursor import ReplayCursor, ReplayDivergence
 from forked.domain.runs.capabilities import AdapterCapabilities
-from forked.domain.runs.event import EventDraft, EventType
+from forked.domain.runs.event import Event, EventDraft, EventType
 from forked.domain.shared.canonical import JsonValue
 from forked.domain.shared.errors import ForkedError
 from forked.domain.shared.identifiers import RunId
@@ -34,6 +43,9 @@ T = TypeVar("T", bound=JsonValue)
 
 SDK_SOURCE = "forked.sdk"
 REPLAY_SOURCE = "forked.replay"
+BRANCH_SOURCE = "forked.branch"
+
+Resolver = Callable[[Event], Resolution]
 
 
 class RecordedToolError(ForkedError):
@@ -47,18 +59,20 @@ class RecordedToolError(ForkedError):
 
 
 class RecordedRun:
-    def __init__(self, session: RecordingSession, cursor: ReplayCursor | None = None) -> None:
+    def __init__(
+        self,
+        session: RecordingSession,
+        resolver: Resolver | None = None,
+        source: str = SDK_SOURCE,
+    ) -> None:
         self._session = session
-        self._cursor = cursor
+        self._resolver = resolver
+        self._source = source
         self._outcome: JsonValue = None
 
     @property
     def run_id(self) -> RunId:
         return self._session.run_id
-
-    @property
-    def is_replay(self) -> bool:
-        return self._cursor is not None
 
     def set_outcome(self, outcome: JsonValue) -> None:
         """Value stored in the ``run.completed`` event."""
@@ -76,8 +90,8 @@ class RecordedRun:
         /,
         **inputs: JsonValue,
     ) -> T:
-        """Record ``tool.call``; then execute ``fn`` (record) or resolve it (replay)."""
-        source = REPLAY_SOURCE if self._cursor else SDK_SOURCE
+        """Record ``tool.call``; then execute ``fn`` or resolve it (replay/branch)."""
+        source = self._source
         call = self._session.capture(
             EventDraft(
                 EventType.TOOL_CALL,
@@ -100,20 +114,32 @@ class RecordedRun:
                 )
             )
 
-        if self._cursor is not None:
-            recorded = self._cursor.resolve(call)
-            outcome(recorded.event_type, recorded.payload)
-            payload = recorded.payload if isinstance(recorded.payload, dict) else {}
-            if recorded.event_type is EventType.TOOL_ERROR:
-                raise RecordedToolError(str(payload.get("error_type")), str(payload.get("message")))
-            return cast(T, payload.get("output"))
+        tag: dict[str, JsonValue] = {}
+        if self._resolver is not None:
+            resolution = self._resolver(call)
+            tag = {"forked": {"decision": resolution.decision.value, "reason": resolution.reason}}
+            if resolution.decision is Decision.DENY:
+                denied: dict[str, JsonValue] = {
+                    "error_type": "EffectDenied",
+                    "message": resolution.reason,
+                }
+                outcome(EventType.TOOL_ERROR, {**denied, **tag})
+                raise EffectDenied(resolution.reason)
+            if resolution.decision is not Decision.ALLOW and resolution.event_type is not None:
+                body = dict(resolution.payload) if isinstance(resolution.payload, dict) else {}
+                body.pop("forked", None)
+                outcome(resolution.event_type, {**body, **tag})
+                if resolution.event_type is EventType.TOOL_ERROR:
+                    raise RecordedToolError(str(body.get("error_type")), str(body.get("message")))
+                return cast(T, body.get("output"))
 
         try:
             result = fn(**inputs)
         except Exception as exc:
-            outcome(EventType.TOOL_ERROR, {"error_type": type(exc).__name__, "message": str(exc)})
+            error: dict[str, JsonValue] = {"error_type": type(exc).__name__, "message": str(exc)}
+            outcome(EventType.TOOL_ERROR, {**error, **tag})
             raise
-        outcome(EventType.TOOL_RESULT, {"output": result})
+        outcome(EventType.TOOL_RESULT, {"output": result, **tag})
         return result
 
 
@@ -134,7 +160,20 @@ class Recorder:
         if self._replayer is None:
             raise ForkedError("this recorder was built without replay support")
         session, cursor = self._replayer.start(source, capabilities)
-        return self._run(session, RecordedRun(session, cursor), cursor)
+
+        def resolve(call: Event) -> Resolution:
+            return Resolution.replayed(cursor.resolve(call))
+
+        return self._run(session, RecordedRun(session, resolve, REPLAY_SOURCE), cursor)
+
+    def branch(
+        self, parent: RunId, capabilities: AdapterCapabilities, intervention: Intervention
+    ) -> AbstractContextManager[RecordedRun]:
+        """Fork ``parent`` at ``intervention.checkpoint`` as a new run (UC-03)."""
+        if self._replayer is None:
+            raise ForkedError("this recorder was built without replay support")
+        session, resolver = self._replayer.branch(parent, capabilities, intervention)
+        return self._run(session, RecordedRun(session, resolver.resolve, BRANCH_SOURCE))
 
     @staticmethod
     @contextmanager

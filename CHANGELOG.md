@@ -26,6 +26,19 @@ Versioning: [SemVer](https://semver.org/) for the package; the CIP schema is ver
     `ReplayDivergence` / `MissingObservation`; recorded tool errors re-raise as
     `RecordedToolError`.
   - A replay is a new run whose `run.started` payload carries `replay_of`.
+- Phase 3: branches, one intervention, effect policy, comparison.
+  - `Recorder.branch(parent, capabilities, Intervention(checkpoint, value))` and
+    `forked branch RUN_ID --at SEQ --value JSON`: the checkpoint is the sequence of a
+    `tool.call`; earlier calls replay strictly, the checkpoint call's result is replaced,
+    later calls replay if unchanged or go to the effect policy.
+  - `DefaultDenyPolicy` (`default-deny/1`): only declared `pure_local` calls execute;
+    everything else raises `EffectDenied`, recorded as a `tool.error`, never executed.
+  - Lineage (`branch_of`, `parent_log_digest`, intervention, policy version) is recorded
+    in the branch's `run.started`; parent artifacts are only read.
+  - `forked compare BASELINE BRANCH [--json]`: per-step diff, outcome changes, five
+    invariants (`verified`/`violated`/`unknown`), claim level (`observational` or
+    `controlled_comparison`; never causal), missing evidence.
 
 ### Not implemented yet
-- Branching, interventions, effect policy, invariants, comparison, evidence export/verification.
+- Evidence package export/verification (Phase 4); user-approved effect policies; more
+  intervention types.

@@ -94,3 +94,37 @@ def test_replay_of_unknown_run_exits_2(tmp_path: Path) -> None:
     result = runner.invoke(app, ["replay", "run_deadbeefdeadbeef", "--store", str(tmp_path)])
     assert result.exit_code == 2
     assert "error[run_not_found]" in result.output
+
+
+def test_branch_and_compare(tmp_path: Path) -> None:
+    store = tmp_path / "store"
+    run_id = _record(store)
+
+    branched = runner.invoke(
+        app, ["branch", run_id, "--at", "3", "--value", "0.5", "--store", str(store)]
+    )
+    assert branched.exit_code == 0, branched.output
+    assert "claim      controlled_comparison" in branched.output
+    branch_id = re.search(r"as (run_[0-9a-f]+)", branched.output).group(1)  # type: ignore[union-attr]
+    assert len(list((store / "toy-outbox").iterdir())) == 1
+
+    report = runner.invoke(app, ["compare", run_id, branch_id, "--json", "--store", str(store)])
+    data = json.loads(report.output)
+    assert data["claim_level"] == "controlled_comparison"
+    assert {i["status"] for i in data["invariants"]} == {"verified"}
+    assert data["intervention"]["operation"] == "replace_recorded_observation"
+
+
+def test_branch_rejects_bad_value_and_bad_checkpoint(tmp_path: Path) -> None:
+    store = tmp_path / "store"
+    run_id = _record(store)
+    bad_json = runner.invoke(
+        app, ["branch", run_id, "--at", "3", "--value", "{", "--store", str(store)]
+    )
+    assert bad_json.exit_code == 2
+    assert "error[invalid_value]" in bad_json.output
+    bad_at = runner.invoke(
+        app, ["branch", run_id, "--at", "0", "--value", "1", "--store", str(store)]
+    )
+    assert bad_at.exit_code == 2
+    assert "error[invalid_checkpoint]" in bad_at.output

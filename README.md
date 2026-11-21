@@ -26,9 +26,9 @@ checkpoint, change exactly one declared thing, keep external side effects under 
 default-deny policy, and get an evidence report that says what was held constant, what
 changed, and **what remains unknown**.
 
-> **Status — honest version.** Pre-alpha. **Recording, inspection and replay of recorded
-> observations work and are tested.** Branching, comparison and evidence export are designed
-> but not implemented. Nothing here is scientifically validated yet. See [roadmap](#roadmap).
+> **Status — honest version.** Pre-alpha. **Recording, inspection, replay, branching with one
+> intervention, default-deny effects and baseline-vs-branch comparison work and are tested** on
+> a toy workflow. The evidence package (Phase 4) is designed but not implemented. Nothing here is scientifically validated yet. See [roadmap](#roadmap).
 
 ## 60-second demo
 
@@ -56,6 +56,25 @@ missing evidence: none detected
 uv run forked inspect <run_id> --events   # every event, its effect class and capture status
 uv run forked inspect <run_id> --json --strict   # machine-readable; exit 1 if evidence is missing
 uv run forked replay <run_id>             # re-run the workflow from the recording: 0 tools execute
+uv run forked branch <run_id> --at 3 --value 0.5   # fork: replace the exchange-rate result
+uv run forked compare <run_id> <branch_id> --json  # steps, outcome diff, invariants, claim level
+```
+
+```text
+steps:
+  #1 search_policy: same [replay]
+  #2 get_exchange_rate: changed [intervene]
+  #3 send_email: changed [deny]
+outcome changes:
+  converted: 92.0 -> 50.0
+  rate: 0.92 -> 0.5
+invariants:
+  verified inv_parent_unchanged      verified inv_prefix_replayed
+  verified inv_no_live_side_effects  verified inv_same_environment   verified inv_same_adapter
+claim      controlled_comparison
+statement  Observed with all 5 invariants verified: after the intervention, outcome fields
+           changed: converted, email, rate. This describes one recorded run pair; it is not a
+           causal estimate.
 ```
 
 The toy agent converts a currency, checks a policy and "emails" finance. Every tool call is
@@ -71,15 +90,22 @@ closed — a call with different inputs, an extra call, a missing or omitted obs
 recorded call never requested all stop the replay with an explicit error instead of quietly
 calling the real tool. It reproduces *recorded observations*, not the original environment.
 
+`branch` forks a run at a tool call and replaces that call's result (the one supported
+intervention). Earlier calls replay; later calls replay if unchanged. A call whose inputs
+changed goes to the **default-deny policy**: only declared `pure_local` tools execute —
+the new email above is **denied, not sent, and not faked**. `compare` marks every invariant
+`verified`, `violated` or `unknown` (missing evidence is never `verified`) and only reaches
+`controlled_comparison` when all are verified; it never emits a causal claim.
+
 ## Why this is different
 
 | | Plain logs / tracing | Framework time-travel | **FORKED** |
 |---|---|---|---|
 | Records what happened | ✅ | ✅ | ✅ typed, ordered, redacted events |
 | Says what was **not** captured | ❌ | ❌ | ✅ explicit missing-evidence list |
-| Classifies side effects | ❌ | app-specific | ✅ CIP effect taxonomy, default-deny *(policy: Phase 3)* |
-| Branch with a declared intervention | ❌ | ✅ (one framework) | 🛠 Phase 3, framework-neutral |
-| Invariants as `verified / violated / unknown` | ❌ | ❌ | 🛠 Phase 3 |
+| Classifies side effects | ❌ | app-specific | ✅ CIP effect taxonomy, default-deny policy |
+| Branch with a declared intervention | ❌ | ✅ (one framework) | ✅ framework-neutral (SDK) |
+| Invariants as `verified / violated / unknown` | ❌ | ❌ | ✅ |
 | Portable, offline-verifiable evidence | ❌ | ❌ | 🛠 Phase 4 |
 
 FORKED **complements** OpenTelemetry, LangGraph, Temporal, Phoenix and LangSmith — it does
@@ -102,8 +128,8 @@ bytes did not change — not that a conclusion is true.
 | 0 | Repository foundation, architecture, CI, policies | ✅ done |
 | 1 | Local recorder, redaction, JSONL store, inspector, CLI | ✅ done |
 | 2 | Replay of recorded observations, fail closed, no tool executes | ✅ done |
-| 3 | Branch lineage, one intervention type, default-deny effect policy, invariants | 🛠 next |
-| 4 | Evidence package (SHA-256 manifest) + offline verifier | planned |
+| 3 | Branch lineage, one intervention type, default-deny effect policy, invariants, comparison | ✅ done |
+| 4 | Evidence package (SHA-256 manifest) + offline verifier | 🛠 next |
 | 5 | OpenTelemetry bridge, first framework adapter, FCRB benchmark | planned |
 | 6 | Public alpha, docs site, community | planned |
 
