@@ -26,9 +26,9 @@ checkpoint, change exactly one declared thing, keep external side effects under 
 default-deny policy, and get an evidence report that says what was held constant, what
 changed, and **what remains unknown**.
 
-> **Status — honest version.** Pre-alpha. **Phase 1 (local recorder + inspector) works and
-> is tested.** Replay, branching, comparison and evidence export are designed but not
-> implemented. Nothing here is scientifically validated yet. See [roadmap](#roadmap).
+> **Status — honest version.** Pre-alpha. **Recording, inspection and replay of recorded
+> observations work and are tested.** Branching, comparison and evidence export are designed
+> but not implemented. Nothing here is scientifically validated yet. See [roadmap](#roadmap).
 
 ## 60-second demo
 
@@ -55,6 +55,7 @@ missing evidence: none detected
 ```bash
 uv run forked inspect <run_id> --events   # every event, its effect class and capture status
 uv run forked inspect <run_id> --json --strict   # machine-readable; exit 1 if evidence is missing
+uv run forked replay <run_id>             # re-run the workflow from the recording: 0 tools execute
 ```
 
 The toy agent converts a currency, checks a policy and "emails" finance. Every tool call is
@@ -64,13 +65,19 @@ limitations. Kill the process mid-run and `inspect` reports the run as **incompl
 exactly which declared capture points were never observed — a partial recording is never
 passed off as a complete one.
 
+`replay` runs the **same workflow code** again, but every tool call is answered from the
+recording: nothing executes, so the "email" is not sent twice. The replay is strict and fails
+closed — a call with different inputs, an extra call, a missing or omitted observation, or a
+recorded call never requested all stop the replay with an explicit error instead of quietly
+calling the real tool. It reproduces *recorded observations*, not the original environment.
+
 ## Why this is different
 
 | | Plain logs / tracing | Framework time-travel | **FORKED** |
 |---|---|---|---|
 | Records what happened | ✅ | ✅ | ✅ typed, ordered, redacted events |
 | Says what was **not** captured | ❌ | ❌ | ✅ explicit missing-evidence list |
-| Classifies side effects | ❌ | app-specific | ✅ CIP effect taxonomy, default-deny *(policy: Phase 2)* |
+| Classifies side effects | ❌ | app-specific | ✅ CIP effect taxonomy, default-deny *(policy: Phase 3)* |
 | Branch with a declared intervention | ❌ | ✅ (one framework) | 🛠 Phase 3, framework-neutral |
 | Invariants as `verified / violated / unknown` | ❌ | ❌ | 🛠 Phase 3 |
 | Portable, offline-verifiable evidence | ❌ | ❌ | 🛠 Phase 4 |
@@ -94,8 +101,8 @@ bytes did not change — not that a conclusion is true.
 |---|---|---|
 | 0 | Repository foundation, architecture, CI, policies | ✅ done |
 | 1 | Local recorder, redaction, JSONL store, inspector, CLI | ✅ done |
-| 2 | Replay of recorded observations; default-deny effect policy; fail closed | 🛠 next |
-| 3 | Branch lineage, one intervention type, invariants | planned |
+| 2 | Replay of recorded observations, fail closed, no tool executes | ✅ done |
+| 3 | Branch lineage, one intervention type, default-deny effect policy, invariants | 🛠 next |
 | 4 | Evidence package (SHA-256 manifest) + offline verifier | planned |
 | 5 | OpenTelemetry bridge, first framework adapter, FCRB benchmark | planned |
 | 6 | Public alpha, docs site, community | planned |

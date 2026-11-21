@@ -11,6 +11,7 @@ from forked.adapters.outbound.persistence.filesystem.store import FileSystemRunS
 from forked.adapters.outbound.system.runtime import PlatformProbe, RandomIdGenerator, SystemClock
 from forked.application.capture import CaptureLimits, CapturePipeline
 from forked.application.commands.record_run import RecordingDependencies, RecordingService
+from forked.application.commands.replay_run import ReplayService
 from forked.application.ports import Clock, IdGenerator
 from forked.application.queries.inspect_run import InspectRun, ListRuns
 from forked.domain.runs.redaction import RedactionPolicy
@@ -43,9 +44,10 @@ def build_application(
         pipeline=CapturePipeline(redaction or RedactionPolicy(), effective_limits),
         limits=effective_limits,
     )
+    recording = RecordingService(deps)
     return Application(
         store_root=store_root,
-        recorder=Recorder(RecordingService(deps)),
+        recorder=Recorder(recording, ReplayService(recording, store, store)),
         inspect_run=InspectRun(store, store),
         list_runs=ListRuns(store),
     )

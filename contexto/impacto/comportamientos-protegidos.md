@@ -47,3 +47,12 @@
 | CP-019 | La CLI sale con 0 / 1 (`--strict` con evidencia faltante) / 2 (error) e imprime `error[<code>]` | `tests/integration/test_cli.py` | sesión 2026-11-21 |
 | CP-020 | El doble `InMemoryRunStore` y `FileSystemRunStore` pasan **el mismo** contrato | `tests/contract/test_run_store_contract.py` | lección heredada de NextVent (B-053) |
 | CP-021 | `contexto/` no tiene enlaces rotos ni documentos huérfanos y toda spec está indexada | `tests/guardians/test_context_graph.py` | ADR-005 |
+
+## Replay
+
+| Id | Comportamiento | Red de seguridad | Origen |
+|---|---|---|---|
+| CP-022 | En replay **ninguna herramienta se ejecuta**, de ninguna clase de efecto; el outbox no cambia | `test_replay.py::test_replay_reproduces_outcome_without_executing_any_tool` · `test_cli.py::test_replay_does_not_touch_the_outbox` · smoke de CI · mutación (7 rojos) | [ADR-010](../forked/decisiones-arquitectura/ADR-010-replay-estricto-sin-politica.md) |
+| CP-023 | Cualquier diferencia de nombre, clase o entradas redactadas aborta el replay (`ReplayDivergence`) y el run queda `failed` | `test_changed_input_diverges_and_fails_the_replay` · `test_effect_class_change_diverges` · mutación (1) | ADR-010 |
+| CP-024 | Sin observación utilizable (llamada extra, sin resultado, resultado omitido) ⇒ `MissingObservation`, nunca llamada en vivo | `test_extra_call_has_no_observation` · `test_omitted_result_cannot_be_replayed` | `docs/04` UC-02 |
+| CP-025 | Llamadas grabadas no pedidas o run de otro adaptador ⇒ el replay falla | `test_unrequested_recorded_calls_fail_the_replay` · `test_other_adapters_run_cannot_be_replayed` · mutación (1) | ADR-010 |

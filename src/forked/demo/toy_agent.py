@@ -87,10 +87,14 @@ def run_toy_agent(
     amount: float = 100.0,
     base: str = "USD",
     quote: str = "EUR",
+    replay_of: RunId | None = None,
 ) -> RunId:
-    """Execute and record the toy agent once. Returns the run id."""
+    """Record the toy agent once, or replay ``replay_of`` (tools are not executed)."""
     send_email = make_send_email(outbox)
-    with recorder.record(CAPABILITIES) as run:
+    session = (
+        recorder.replay(replay_of, CAPABILITIES) if replay_of else recorder.record(CAPABILITIES)
+    )
+    with session as run:
         policy = run.call_tool(
             "search_policy", EffectClass.PURE_LOCAL, search_policy, query="currency conversion"
         )

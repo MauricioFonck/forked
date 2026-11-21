@@ -109,7 +109,10 @@ class RecordingService:
     def __init__(self, deps: RecordingDependencies) -> None:
         self._deps = deps
 
-    def start(self, capabilities: AdapterCapabilities) -> RecordingSession:
+    def start(
+        self, capabilities: AdapterCapabilities, *, replay_of: RunId | None = None
+    ) -> RecordingSession:
+        """Start a run. ``replay_of`` marks it as a replay of another run in ``run.started``."""
         run = Run.start(
             run_id=self._deps.ids.new_run_id(),
             capabilities=capabilities,
@@ -118,15 +121,12 @@ class RecordingService:
         )
         self._deps.runs.save(run.snapshot())
         session = RecordingSession(run, self._deps)
-        session.capture(
-            EventDraft(
-                EventType.RUN_STARTED,
-                RECORDER_SOURCE,
-                {
-                    "adapter": capabilities.name,
-                    "adapter_version": capabilities.version,
-                    "limitations": list(capabilities.limitations),
-                },
-            )
-        )
+        started: dict[str, JsonValue] = {
+            "adapter": capabilities.name,
+            "adapter_version": capabilities.version,
+            "limitations": list(capabilities.limitations),
+        }
+        if replay_of is not None:
+            started["replay_of"] = replay_of.value
+        session.capture(EventDraft(EventType.RUN_STARTED, RECORDER_SOURCE, started))
         return session

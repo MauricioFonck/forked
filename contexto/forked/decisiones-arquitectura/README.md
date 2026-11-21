@@ -24,3 +24,4 @@ Añade una entrada cuando tomes una decisión arquitectónica relevante, con la 
 | [007](ADR-007-omitir-no-truncar.md) | Payload grande: omitir con digest, nunca truncar; sobre-redacción aceptada | Vigente | `application/capture.py` |
 | [008](ADR-008-toolchain.md) | uv + hatchling, Python ≥ 3.11, Pydantic solo en el borde | Vigente | `pyproject.toml`, `uv.lock` |
 | [009](ADR-009-secuencia-ids-tiempo.md) | Secuencia contigua desde 0, ids aleatorios, tiempo UTC con zona | Vigente | `domain/runs/run.py`, `domain/runs/sequence.py` |
+| [010](ADR-010-replay-estricto-sin-politica.md) | Replay estricto que nunca ejecuta herramientas; política de efectos a la Fase 3 | Vigente | `domain/replay/cursor.py`, `tests/acceptance/test_replay.py` |

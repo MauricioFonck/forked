@@ -44,3 +44,5 @@ jobs:
           uv run forked record toy-agent
           RUN_ID=$(uv run forked runs | awk '{print $1}')
           uv run forked inspect "$RUN_ID" --strict --json
+          uv run forked replay "$RUN_ID"
+          test "$(ls "$FORKED_STORE/toy-outbox" | wc -l)" -eq 1  # replay sent nothing

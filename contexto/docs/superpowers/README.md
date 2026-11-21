@@ -23,4 +23,4 @@ contexto/docs/superpowers/specs/
 |----|------|------|------|------|-------|--------|
 | 001 | cimientos-del-repositorio | 0 | [spec](specs/001-cimientos-del-repositorio/spec.md) | [plan](specs/001-cimientos-del-repositorio/plan.md) | [tasks](specs/001-cimientos-del-repositorio/tasks.md) | ✅ hecha |
 | 002 | grabador-local | 1 | [spec](specs/002-grabador-local/spec.md) | [plan](specs/002-grabador-local/plan.md) | [tasks](specs/002-grabador-local/tasks.md) | ✅ hecha |
-| 003 | replay-de-observaciones | 2 | [spec](specs/003-replay-de-observaciones/spec.md) | — | — | 📝 borrador |
+| 003 | replay-de-observaciones | 2 | [spec](specs/003-replay-de-observaciones/spec.md) | [plan](specs/003-replay-de-observaciones/plan.md) | [tasks](specs/003-replay-de-observaciones/tasks.md) | ✅ hecha |

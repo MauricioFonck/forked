@@ -1,8 +1,10 @@
-# Spec 003 · Replay de observaciones grabadas (Fase 2) — BORRADOR
+# Spec 003 · Replay de observaciones grabadas (Fase 2)
 
-[Bitácora de origen](../../../../sesiones/2026-11-21-arranque-fase-0-y-1.md) · [Contexto `effects`](../../../../modulos/effects/README.md) · [Política de efectos](../../../../diagramas/politica-efectos.md)
+[Plan](plan.md) · [Tareas](tasks.md) · [Bitácora](../../../../sesiones/2026-11-21-b-publicacion-y-fase-2.md) · [Impacto](../../../../impacto/2026-11-21-b-publicacion-y-fase-2.md) · [Contexto `effects`](../../../../modulos/effects/README.md) · [Política de efectos](../../../../diagramas/politica-efectos.md)
 
-**Fecha:** 2026-11-21 · **Estado:** borrador — falta revisión del dueño, `plan.md` y `tasks.md`.
+**Fecha:** 2026-11-21 · **Estado:** hecha. Lo implementado difiere de la propuesta original en un punto: **no hay
+`EffectPolicy` en la Fase 2** ([ADR-010](../../../../forked/decisiones-arquitectura/ADR-010-replay-estricto-sin-politica.md)).
+La propuesta se conserva abajo como registro.
 
 ## Qué y por qué
 
@@ -33,13 +35,16 @@ alimentando a cada herramienta con su **resultado grabado**, sin repetir escritu
 
 ## Criterios de aceptación (de `docs/09` Fase 2)
 
-- [ ] El demo reproduce la salida grabada de cada herramienta.
-- [ ] Un test prueba que `send_email` (y cualquier `external_write`) **no se invocó** en replay (espía + outbox intacto).
-- [ ] Observación faltante ⇒ fallo cerrado, nunca llamada en vivo.
-- [ ] Ningún camino de escritura externa alcanzable en modo replay (test + guardián si aplica).
-- [ ] Reporte de replay con fidelidad y límites documentados; sin afirmar reproducción exacta.
+- [x] El demo reproduce la salida grabada de cada herramienta.
+- [x] Un test prueba que `send_email` (y cualquier `external_write`) **no se invocó** en replay (espía + outbox intacto).
+- [x] Observación faltante ⇒ fallo cerrado, nunca llamada en vivo.
+- [x] Ningún camino de escritura externa alcanzable en modo replay (test + guardián si aplica).
+- [x] Reporte de replay con fidelidad y límites documentados; sin afirmar reproducción exacta.
 
-## Preguntas abiertas para el dueño
+Nota: el «reporte de replay» es el reporte normal de `inspect` sobre el run de replay (completitud 100 %, evidencia
+faltante, limitaciones); la fidelidad es binaria porque el replay es estricto: o consume todas las observaciones o falla.
 
-1. ¿El replay re-ejecuta el código del flujo (como hoy el demo) o solo valida el log sin código? Propuesta: re-ejecuta.
-2. ¿Una divergencia de entradas aborta el replay o se registra y continúa en modo «solo reporte»? Propuesta: aborta.
+## Preguntas que estaban abiertas (resueltas por defecto, el dueño pidió avanzar)
+
+1. ¿Re-ejecuta el código del flujo o solo valida el log? → **Re-ejecuta.**
+2. ¿Una divergencia aborta o continúa en «solo reporte»? → **Aborta.** Un modo «solo reporte» sería explícito y futuro.

@@ -39,7 +39,8 @@ vuelta aquí con `↑ Memoria central`.
 - Persistencia local: **JSONL append-only** por run + metadatos `run.json` reemplazados de forma atómica. Sin nube, sin
   telemetría, sin red obligatoria.
 - **Seguridad por defecto:** redacción de secretos antes de persistir; efectos externos clasificados con la taxonomía
-  CIP y **denegados por defecto** en replay y ramas (la política llega en la Fase 2).
+  CIP y **denegados por defecto** en replay y ramas (el replay no ejecuta ninguna herramienta; la política de
+  decisión llega con las ramas en la Fase 3, [ADR-010](forked/decisiones-arquitectura/ADR-010-replay-estricto-sin-politica.md)).
 - Hoy funcionan las **Fases 0 y 1** (cimientos + grabador local). Estado vivo en
   [`forked/estado-actual.md`](forked/estado-actual.md); visión completa en
   [`forked/contexto-general.md`](forked/contexto-general.md); plan en [`forked/roadmap.md`](forked/roadmap.md).
@@ -75,7 +76,8 @@ Antes de cambiar algo se escribe su [impacto](impacto/README.md); al cerrar, su 
 | **Redacción de secretos** | [Pipeline de captura](diagramas/pipeline-captura.md) · [ADR-007](forked/decisiones-arquitectura/ADR-007-omitir-no-truncar.md) | Todo texto libre (mensajes de excepción) pasa por el pipeline antes de tocar disco (CP-005) |
 | **Persistencia** (JSONL, `run.json`) | [Contexto `runs`](modulos/runs/README.md#persistencia) · [ADR-004](forked/decisiones-arquitectura/ADR-004-persistencia-fase-1.md) | Una línea truncada o malformada falla cerrada con su número de línea; nunca se salta (CP-012) |
 | **El esquema del evento** | [Versionado](protocolo/versionado.md) · [`spec/cip/v0.1/`](../spec/cip/v0.1/event.schema.json) | Regenerar con `scripts/export_schemas.py`; **nunca** editar un fixture dorado publicado (CP-016) |
-| **Efectos y política** (Fase 2) | [Taxonomía de efectos](protocolo/taxonomia-de-efectos.md) · [Contexto `effects`](modulos/effects/README.md) · [Spec 003](docs/superpowers/specs/003-replay-de-observaciones/spec.md) | `SIMULATE` jamás se reporta como resultado real; lo desconocido se deniega |
+| **Replay** | [Contexto `replay`](modulos/replay/README.md) · [ADR-010](forked/decisiones-arquitectura/ADR-010-replay-estricto-sin-politica.md) · [Spec 003](docs/superpowers/specs/003-replay-de-observaciones/spec.md) | En replay `call_tool` **no tiene camino** hacia `fn`; toda duda falla cerrado (CP-022…025) |
+| **Efectos y política** (Fase 3) | [Taxonomía de efectos](protocolo/taxonomia-de-efectos.md) · [Contexto `effects`](modulos/effects/README.md) · [Spec 003](docs/superpowers/specs/003-replay-de-observaciones/spec.md) | `SIMULATE` jamás se reporta como resultado real; lo desconocido se deniega |
 | **Un puerto o adaptador nuevo** | [Arquitectura](forked/arquitectura.md) · [Convenciones](forked/convenciones.md) | El doble de test pasa **el mismo** contrato que el adaptador real (CP-020) |
 | **La CLI** | [Contexto `runs`](modulos/runs/README.md#cli) | Códigos de salida 0/1/2 y `error[codigo]` son contrato (CP-019) |
 | **Afirmaciones en reportes o README** | [Hipótesis](investigacion/hipotesis.md) · [ADR-003](forked/decisiones-arquitectura/ADR-003-vocabulario-cip.md) | Nada se llama «causal», «determinista» o «validado» sin la evidencia que lo sostenga |
@@ -111,8 +113,8 @@ Son módulos lógicos de **un solo paquete**, no servicios. Solo existe carpeta 
 | Contexto | Qué hace | Estado | Código |
 |---|---|---|---|
 | [runs](modulos/runs/README.md) | Ciclo de vida del run, sobre de evento, secuencia, redacción, completitud, persistencia, SDK y CLI | ✅ Fase 1 | `domain/runs/`, `application/`, `adapters/` |
-| [effects](modulos/effects/README.md) | Taxonomía de efectos (hecho) y política default-deny (Fase 2) | 🟡 parcial | `domain/effects/` |
-| replay | Resolver observaciones grabadas; fallar cerrado | ⏳ Fase 2 | — |
+| [effects](modulos/effects/README.md) | Taxonomía de efectos (hecho) y política default-deny (Fase 3) | 🟡 parcial | `domain/effects/` |
+| [replay](modulos/replay/README.md) | Resolver observaciones grabadas; fallar cerrado | ✅ Fase 2 | `domain/replay/` |
 | branches | Linaje inmutable e intervenciones | ⏳ Fase 3 | — |
 | comparison | Invariantes `verified/violated/unknown` y diferencias | ⏳ Fase 3 | — |
 | evidence | Manifiesto SHA-256, exportación y verificación offline | ⏳ Fase 4 | — |

@@ -143,6 +143,26 @@ def record(
 
 
 @app.command()
+def replay(
+    run_id: Annotated[str, typer.Argument(help="Recorded run to replay.")],
+    store: StoreOption = DEFAULT_STORE,
+) -> None:
+    """Re-run the toy-agent workflow from RUN_ID's recorded observations.
+
+    No tool executes: every result comes from the recording, so the outbox is never
+    written. A call the recording cannot answer fails the replay (exit 2).
+    """
+    application = _app(store)
+    try:
+        new_id = run_toy_agent(application.recorder, store / "toy-outbox", replay_of=RunId(run_id))
+        report = application.inspect_run.execute(new_id)
+    except ForkedError as exc:
+        raise _fail(exc) from exc
+    typer.echo(f"replayed {run_id} as {new_id} (0 tools executed)")
+    _print_report(report, show_events=False)
+
+
+@app.command()
 def inspect(
     run_id: Annotated[str, typer.Argument(help="Run id, e.g. run_0a1b2c3d...")],
     store: StoreOption = DEFAULT_STORE,

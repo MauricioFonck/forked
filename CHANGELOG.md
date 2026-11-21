@@ -19,6 +19,13 @@ Versioning: [SemVer](https://semver.org/) for the package; the CIP schema is ver
   - Python SDK (`Recorder`) and CLI: `forked record toy-agent`, `forked inspect`, `forked runs`.
   - Event schema v0.1.0 published in `spec/cip/v0.1/` with golden fixtures.
   - Guardians: hexagonal dependency rule, published-schema drift, `contexto/` link graph.
+- Phase 2: replay of recorded observations.
+  - `Recorder.replay(run_id, capabilities)` and `forked replay RUN_ID`: re-run the workflow
+    with every tool call answered from the recording; tools are never executed.
+  - Strict, fail-closed matching (tool name, effect class, redacted inputs, order):
+    `ReplayDivergence` / `MissingObservation`; recorded tool errors re-raise as
+    `RecordedToolError`.
+  - A replay is a new run whose `run.started` payload carries `replay_of`.
 
 ### Not implemented yet
-- Replay, branching, interventions, invariants, comparison, evidence export/verification.
+- Branching, interventions, effect policy, invariants, comparison, evidence export/verification.

@@ -75,3 +75,22 @@ def test_empty_store(tmp_path: Path) -> None:
     result = runner.invoke(app, ["runs", "--store", str(tmp_path / "empty")])
     assert result.exit_code == 0
     assert "no runs" in result.output
+
+
+def test_replay_does_not_touch_the_outbox(tmp_path: Path) -> None:
+    store = tmp_path / "store"
+    run_id = _record(store)
+    before = sorted((store / "toy-outbox").iterdir())
+
+    result = runner.invoke(app, ["replay", run_id, "--store", str(store)])
+
+    assert result.exit_code == 0, result.output
+    assert f"replayed {run_id} as run_" in result.output
+    assert "missing evidence: none detected" in result.output
+    assert sorted((store / "toy-outbox").iterdir()) == before
+
+
+def test_replay_of_unknown_run_exits_2(tmp_path: Path) -> None:
+    result = runner.invoke(app, ["replay", "run_deadbeefdeadbeef", "--store", str(tmp_path)])
+    assert result.exit_code == 2
+    assert "error[run_not_found]" in result.output
