@@ -14,7 +14,8 @@ Cada contexto acotado de [`docs/05`](../../docs/05-architecture.md) §5.5 es un 
 | Branches & Interventions | [branches](branches/README.md) | Linaje inmutable, checkpoint, una intervención, resolución por política | ✅ implementado | 3 |
 | Comparison & Invariants | [branches](branches/README.md) (misma página) | Diferencias por paso y de resultado, 5 invariantes, nivel de afirmación | ✅ implementado | 3 |
 | Evidence | [evidence](evidence/README.md) | Manifiestos, hashes, exportación y verificación offline | ✅ implementado | 4 |
-| Integrations | — | Contratos de adaptador e integraciones concretas (OTel, frameworks) | ⏳ | 5 |
+| Integrations | [integrations](integrations/README.md) | Adaptador Pydantic AI y puente OpenTelemetry | ✅ implementado | 5 |
+| Benchmarks | [benchmarks](benchmarks/README.md) | FCRB: 10 escenarios, línea base ejecutada, runner reproducible | ✅ provisional | 5 |
 | Interfaces | dentro de [runs](runs/README.md#cli) | CLI hoy; UI/API después | ✅ CLI | 1 |
 
 Dependencias permitidas entre contextos: `runs` y `effects` no dependen de nadie (salvo `domain/shared`). Replay

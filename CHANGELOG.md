@@ -50,6 +50,20 @@ Versioning: [SemVer](https://semver.org/) for the package; the CIP schema is ver
     exactly, and `comparison.json` must equal the recomputed comparison). Rejects symlinks.
     Exit 1 if either fails.
 
+- Phase 5: first framework adapter, OpenTelemetry bridge, FCRB benchmark.
+  - Pydantic AI adapter (`pip install forked-runtime[pydantic-ai]`): one `ForkedToolset` routes
+    every tool call through a `RecordedRun`, so recording, replay and branching share one seam.
+    `RecordedRun.acall_tool` is the async twin of `call_tool`. ADR-013 records why this framework
+    was chosen first.
+  - `forked otel-export RUN [--include-payloads]`: OTLP/JSON `forked.run` span plus one
+    `execute_tool` span per call (GenAI attribute names, `forked.*` for effect class, capture
+    status, policy decision). Deterministic; payloads left out unless requested.
+  - `forked otel-import FILE`: tool spans become a run; every effect is `unknown`, completeness is
+    unknown, malformed or oversized traces are rejected.
+  - `python -m benchmarks.fcrb`: ten scenarios from docs/08, an executed plain-log baseline,
+    capture overhead, `results.json` + `REPORT.md`. Provisional and not validated.
+  - `build_application(probe=...)`; `examples/pydantic_ai_expense_agent.py`.
+
 ### Not implemented yet
-- Framework adapters, OpenTelemetry bridge, FCRB benchmark (Phase 5); user-approved effect
-  policies; more intervention types; signed manifests.
+- More framework adapters (LangGraph next), independent reproduction of the benchmark, a docs
+  site (Phase 6); user-approved effect policies; more intervention types; signed manifests.

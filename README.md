@@ -28,7 +28,9 @@ changed, and **what remains unknown**.
 
 > **Status — honest version.** Pre-alpha. **Recording, inspection, replay, branching with one
 > intervention, default-deny effects, baseline-vs-branch comparison and offline-verifiable
-> evidence packages work and are tested** on a toy workflow. No framework adapter yet. Nothing here is scientifically validated yet. See [roadmap](#roadmap).
+> evidence packages work and are tested** on toy workflows, including one agent built with
+> Pydantic AI and an OpenTelemetry export/import bridge. A first reproducible benchmark runs offline.
+> No other framework adapter yet. Nothing here is scientifically validated yet. See [roadmap](#roadmap).
 
 ## 60-second demo
 
@@ -99,6 +101,19 @@ the new email above is **denied, not sent, and not faked**. `compare` marks ever
 `verified`, `violated` or `unknown` (missing evidence is never `verified`) and only reaches
 `controlled_comparison` when all are verified; it never emits a causal claim.
 
+### An agent framework, a trace bridge and a benchmark
+
+```bash
+uv run python -m examples.pydantic_ai_expense_agent   # a Pydantic AI agent: record, replay, branch, verify
+uv run forked otel-export <run_id> --out trace.json   # tool spans as OTLP/JSON (payloads only with --include-payloads)
+uv run forked otel-import trace.json                  # a trace becomes a run: every effect is `unknown` (denied)
+uv run python -m benchmarks.fcrb --out results/       # 10 scenarios + a plain-log baseline, offline
+```
+
+[`examples/`](examples/README.md) walks through the agent; [`benchmarks/`](benchmarks/README.md)
+explains the ten scenarios, how to reproduce them from a clean clone and what they do **not** show.
+The benchmark is provisional and **not validated**: nobody independent has reproduced it yet.
+
 `export` writes a deterministic evidence package (same runs, same bytes) and refuses to
 include anything shaped like a credential. `verify` needs **only the package** and answers
 two separate questions: *integrity* (every file matches its SHA-256, nothing missing, nothing
@@ -140,8 +155,8 @@ bytes did not change — not that a conclusion is true.
 | 2 | Replay of recorded observations, fail closed, no tool executes | ✅ done |
 | 3 | Branch lineage, one intervention type, default-deny effect policy, invariants, comparison | ✅ done |
 | 4 | Evidence package (SHA-256 manifest) + offline verifier | ✅ done |
-| 5 | OpenTelemetry bridge, first framework adapter, FCRB benchmark | 🛠 next |
-| 6 | Public alpha, docs site, community | planned |
+| 5 | OpenTelemetry bridge, first framework adapter (Pydantic AI), FCRB benchmark | ✅ done (not independently reproduced) |
+| 6 | Public alpha, docs site, community | 🛠 next |
 
 Details and exit criteria: [`docs/09-roadmap-and-backlog.md`](docs/09-roadmap-and-backlog.md).
 

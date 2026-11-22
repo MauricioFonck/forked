@@ -33,6 +33,7 @@ tarea, auditar lo que hizo una IA sin releer todo el diff y correlacionar un fal
 
 | Fecha | Sesión | Rama | Áreas | Impacto | Fallos |
 |---|---|---|---|---|---|
+| 2026-11-22 | [Fase 5: adaptador Pydantic AI, puente OTel y benchmark FCRB](2026-11-22-e-fase-5-adaptador-y-benchmark.md) | `main` | SDK, adaptador, dominio, CLI, benchmark, CI | [2026-11-22 (e)](../impacto/2026-11-22-e-fase-5-adaptador-y-benchmark.md) | ninguna |
 | 2026-11-21 | [Fase 4: paquete de evidencia y verificador offline](2026-11-21-d-fase-4-evidencia.md) | `main` | dominio, adaptador, CLI, CI | [2026-11-21 (d)](../impacto/2026-11-21-d-fase-4-evidencia.md) | [B-001](../errores/bugs/B-001-el-verificador-solo-revisaba-el-titular-de-la-afirmacion.md) |
 | 2026-11-21 | [Fase 3: ramas, intervención, política y comparación](2026-11-21-c-fase-3-ramas.md) | `main` | dominio, SDK, CLI, CI | [2026-11-21 (c)](../impacto/2026-11-21-c-fase-3-ramas.md) | ninguna |
 | 2026-11-21 | [Publicación en GitHub y Fase 2 (replay)](2026-11-21-b-publicacion-y-fase-2.md) | `main` | GitHub, replay, SDK, CLI, CI | [2026-11-21 (b)](../impacto/2026-11-21-b-publicacion-y-fase-2.md) | ninguna |

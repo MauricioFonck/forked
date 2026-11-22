@@ -10,6 +10,7 @@ from typing import Annotated, Any
 import typer
 
 from forked import __version__
+from forked.application.errors import StorageFailure
 from forked.application.queries.inspect_run import RunReport
 from forked.bootstrap.container import Application, build_application, verify_package
 from forked.demo.toy_agent import CAPABILITIES, run_toy_agent
@@ -17,6 +18,7 @@ from forked.domain.branches.branch import Intervention
 from forked.domain.comparison.compare import Comparison
 from forked.domain.shared.errors import ForkedError
 from forked.domain.shared.identifiers import RunId
+from forked.domain.telemetry.otlp import InvalidTrace, parse_tool_spans
 
 app = typer.Typer(
     help="FORKED — record, inspect and (soon) branch instrumented executions. Local-first.",
@@ -307,6 +309,60 @@ def verify(
         typer.echo(f"note       {validity.note}")
     if not report.ok:
         raise typer.Exit(code=1)
+
+
+MAX_TRACE_BYTES = 5 * 1024 * 1024
+
+
+@app.command("otel-export")
+def otel_export(
+    run_id: Annotated[str, typer.Argument(help="Run to export as OTLP/JSON tool spans.")],
+    out: Annotated[Path | None, typer.Option("--out", help="Write here instead of stdout.")] = None,
+    include_payloads: Annotated[
+        bool,
+        typer.Option(
+            "--include-payloads", help="Include (already redacted) arguments and results."
+        ),
+    ] = False,
+    store: StoreOption = DEFAULT_STORE,
+) -> None:
+    """Export a run as OpenTelemetry (OTLP/JSON). Payloads are left out unless requested."""
+    try:
+        document = _app(store).export_trace.execute(
+            RunId(run_id), include_payloads=include_payloads
+        )
+    except ForkedError as exc:
+        raise _fail(exc) from exc
+    text = json.dumps(document, indent=2, sort_keys=True)
+    if out is None:
+        typer.echo(text)
+    else:
+        out.write_text(text + "\n", encoding="utf-8")
+        typer.echo(f"wrote {out}")
+
+
+@app.command("otel-import")
+def otel_import(
+    trace: Annotated[Path, typer.Argument(help="OTLP/JSON file with execute_tool spans.")],
+    store: StoreOption = DEFAULT_STORE,
+) -> None:
+    """Record the tool spans of an OTLP/JSON trace as a run. Effects are `unknown` (denied)."""
+    try:
+        if not trace.is_file() or trace.stat().st_size > MAX_TRACE_BYTES:
+            raise StorageFailure(
+                f"{trace} is not a readable file of at most {MAX_TRACE_BYTES} bytes"
+            )
+        try:
+            document = json.loads(trace.read_text(encoding="utf-8"))
+        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise InvalidTrace(f"{trace} is not valid JSON: {exc}") from exc
+        application = _app(store)
+        run_id = application.import_trace.execute(parse_tool_spans(document))
+        report = application.inspect_run.execute(run_id)
+    except ForkedError as exc:
+        raise _fail(exc) from exc
+    typer.echo(f"imported {run_id}")
+    _print_report(report, show_events=False)
 
 
 @app.command()

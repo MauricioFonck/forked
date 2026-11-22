@@ -52,3 +52,12 @@ jobs:
           uv run forked verify "$RUNNER_TEMP/evidence"
           rm -rf "$FORKED_STORE/runs" && uv run forked verify "$RUNNER_TEMP/evidence"  # needs only the package
           test "$(ls "$FORKED_STORE/toy-outbox" | wc -l)" -eq 1  # replay and branch sent nothing
+          uv run forked otel-export "$RUN_ID" --include-payloads --out "$RUNNER_TEMP/trace.json"
+          uv run forked otel-import "$RUNNER_TEMP/trace.json"
+      - name: Pydantic AI example and FCRB benchmark (offline)
+        shell: bash
+        run: |
+          export PYDANTIC_AI_NO_BANNER=1
+          uv run python -m examples.pydantic_ai_expense_agent
+          uv run python -m benchmarks.fcrb --out "$RUNNER_TEMP/fcrb"
+          grep -q "S10" "$RUNNER_TEMP/fcrb/REPORT.md"

@@ -16,9 +16,10 @@ from forked.application.commands.evidence import (
     VerificationReport,
     verify_evidence,
 )
+from forked.application.commands.otel import ExportTrace, ImportTrace
 from forked.application.commands.record_run import RecordingDependencies, RecordingService
 from forked.application.commands.replay_run import ReplayService
-from forked.application.ports import Clock, IdGenerator
+from forked.application.ports import Clock, EnvironmentProbe, IdGenerator
 from forked.application.queries.inspect_run import CompareRuns, InspectRun, ListRuns
 from forked.domain.runs.redaction import RedactionPolicy
 from forked.domain.shared.identifiers import RunId
@@ -32,6 +33,8 @@ class Application:
     list_runs: ListRuns
     compare_runs: CompareRuns
     export: ExportEvidence
+    export_trace: ExportTrace
+    import_trace: ImportTrace
 
     def export_evidence(self, baseline: RunId, branch: RunId, out: Path) -> dict[str, bytes]:
         files = self.export.execute(baseline, branch)
@@ -46,6 +49,7 @@ def build_application(
     ids: IdGenerator | None = None,
     redaction: RedactionPolicy | None = None,
     limits: CaptureLimits | None = None,
+    probe: EnvironmentProbe | None = None,
 ) -> Application:
     store = FileSystemRunStore(store_root)
     effective_limits = limits or CaptureLimits()
@@ -54,7 +58,7 @@ def build_application(
         runs=store,
         clock=clock or SystemClock(),
         ids=ids or RandomIdGenerator(),
-        probe=PlatformProbe(),
+        probe=probe or PlatformProbe(),
         pipeline=CapturePipeline(redaction or RedactionPolicy(), effective_limits),
         limits=effective_limits,
     )
@@ -68,6 +72,8 @@ def build_application(
         list_runs=ListRuns(store),
         compare_runs=compare,
         export=ExportEvidence(inspect, compare, store, redaction or RedactionPolicy()),
+        export_trace=ExportTrace(inspect),
+        import_trace=ImportTrace(recording),
     )
 
 

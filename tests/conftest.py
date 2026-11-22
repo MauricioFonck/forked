@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import pytest
@@ -8,6 +9,8 @@ from forked.bootstrap.container import Application, build_application
 from forked.domain.runs.capabilities import AdapterCapabilities, tool_capture_point
 from forked.domain.runs.redaction import RedactionPolicy
 from tests.fakes import InMemoryRunStore, SequentialIds, StaticProbe, SteppingClock
+
+os.environ.setdefault("PYDANTIC_AI_NO_BANNER", "1")  # cosmetic Logfire banner in pydantic-ai
 
 CAPS = AdapterCapabilities(
     name="test-adapter",

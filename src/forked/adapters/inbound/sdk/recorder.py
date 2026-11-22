@@ -23,7 +23,7 @@ else raises ``EffectDenied`` (recorded as a ``tool.error``) without executing.
 Every outcome in replay/branch mode carries ``payload.forked = {decision, reason}``.
 """
 
-from collections.abc import Callable, Iterator
+from collections.abc import Awaitable, Callable, Iterator
 from contextlib import AbstractContextManager, contextmanager
 from typing import TypeVar, cast
 
@@ -82,15 +82,8 @@ class RecordedRun:
     def outcome(self) -> JsonValue:
         return self._outcome
 
-    def call_tool(
-        self,
-        name: str,
-        effect: EffectClass,
-        fn: Callable[..., T],
-        /,
-        **inputs: JsonValue,
-    ) -> T:
-        """Record ``tool.call``; then execute ``fn`` or resolve it (replay/branch)."""
+    def _begin(self, name: str, effect: EffectClass, inputs: dict[str, JsonValue]) -> "_Step":
+        """Record ``tool.call`` and, in replay/branch mode, ask the resolver what to do."""
         source = self._source
         call = self._session.capture(
             EventDraft(
@@ -102,7 +95,7 @@ class RecordedRun:
             )
         )
 
-        def outcome(event_type: EventType, payload: JsonValue) -> None:
+        def record(event_type: EventType, payload: JsonValue) -> None:
             self._session.capture(
                 EventDraft(
                     event_type,
@@ -114,33 +107,83 @@ class RecordedRun:
                 )
             )
 
-        tag: dict[str, JsonValue] = {}
-        if self._resolver is not None:
-            resolution = self._resolver(call)
-            tag = {"forked": {"decision": resolution.decision.value, "reason": resolution.reason}}
-            if resolution.decision is Decision.DENY:
-                denied: dict[str, JsonValue] = {
-                    "error_type": "EffectDenied",
-                    "message": resolution.reason,
-                }
-                outcome(EventType.TOOL_ERROR, {**denied, **tag})
-                raise EffectDenied(resolution.reason)
-            if resolution.decision is not Decision.ALLOW and resolution.event_type is not None:
-                body = dict(resolution.payload) if isinstance(resolution.payload, dict) else {}
-                body.pop("forked", None)
-                outcome(resolution.event_type, {**body, **tag})
-                if resolution.event_type is EventType.TOOL_ERROR:
-                    raise RecordedToolError(str(body.get("error_type")), str(body.get("message")))
-                return cast(T, body.get("output"))
+        step = _Step(record)
+        if self._resolver is None:
+            return step
+        resolution = self._resolver(call)
+        step.tag = {"forked": {"decision": resolution.decision.value, "reason": resolution.reason}}
+        if resolution.decision is Decision.DENY:
+            denied: dict[str, JsonValue] = {
+                "error_type": "EffectDenied",
+                "message": resolution.reason,
+            }
+            record(EventType.TOOL_ERROR, {**denied, **step.tag})
+            raise EffectDenied(resolution.reason)
+        if resolution.decision is not Decision.ALLOW and resolution.event_type is not None:
+            body = dict(resolution.payload) if isinstance(resolution.payload, dict) else {}
+            body.pop("forked", None)
+            record(resolution.event_type, {**body, **step.tag})
+            if resolution.event_type is EventType.TOOL_ERROR:
+                raise RecordedToolError(str(body.get("error_type")), str(body.get("message")))
+            step.answered, step.value = True, body.get("output")
+        return step
 
+    def call_tool(
+        self,
+        name: str,
+        effect: EffectClass,
+        fn: Callable[..., T],
+        /,
+        **inputs: JsonValue,
+    ) -> T:
+        """Record ``tool.call``; then execute ``fn`` or resolve it (replay/branch)."""
+        step = self._begin(name, effect, inputs)
+        if step.answered:
+            return cast(T, step.value)
         try:
             result = fn(**inputs)
         except Exception as exc:
-            error: dict[str, JsonValue] = {"error_type": type(exc).__name__, "message": str(exc)}
-            outcome(EventType.TOOL_ERROR, {**error, **tag})
+            step.fail(exc)
             raise
-        outcome(EventType.TOOL_RESULT, {"output": result, **tag})
+        step.ok(result)
         return result
+
+    async def acall_tool(
+        self,
+        name: str,
+        effect: EffectClass,
+        fn: Callable[..., Awaitable[T]],
+        /,
+        **inputs: JsonValue,
+    ) -> T:
+        """Async twin of :meth:`call_tool` (same recording, replay and branch semantics)."""
+        step = self._begin(name, effect, inputs)
+        if step.answered:
+            return cast(T, step.value)
+        try:
+            result = await fn(**inputs)
+        except Exception as exc:
+            step.fail(exc)
+            raise
+        step.ok(result)
+        return result
+
+
+class _Step:
+    """One tool call in flight: how to record its outcome, and a replayed answer if any."""
+
+    def __init__(self, record: Callable[[EventType, JsonValue], None]) -> None:
+        self._record = record
+        self.tag: dict[str, JsonValue] = {}
+        self.answered = False
+        self.value: object = None
+
+    def ok(self, result: JsonValue) -> None:
+        self._record(EventType.TOOL_RESULT, {"output": result, **self.tag})
+
+    def fail(self, exc: Exception) -> None:
+        error: dict[str, JsonValue] = {"error_type": type(exc).__name__, "message": str(exc)}
+        self._record(EventType.TOOL_ERROR, {**error, **self.tag})
 
 
 class Recorder:
@@ -148,10 +191,12 @@ class Recorder:
         self._service = service
         self._replayer = replayer
 
-    def record(self, capabilities: AdapterCapabilities) -> AbstractContextManager[RecordedRun]:
+    def record(
+        self, capabilities: AdapterCapabilities, *, source: str = SDK_SOURCE
+    ) -> AbstractContextManager[RecordedRun]:
         """Record one run. An exception inside the block finalizes it as failed."""
         session = self._service.start(capabilities)
-        return self._run(session, RecordedRun(session))
+        return self._run(session, RecordedRun(session, source=source))
 
     def replay(
         self, source: RunId, capabilities: AdapterCapabilities

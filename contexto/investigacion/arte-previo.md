@@ -16,3 +16,10 @@ Antes de llamar **novedoso** al CIP o proponerlo como estándar ([`docs/12`](../
 
 Mientras esta puerta esté cerrada, el README y cualquier comunicación dicen «borrador», «propuesta» o «hipótesis»,
 nunca «primer», «único» o «estándar».
+
+## Nota 2026-11-22 (Fase 5)
+
+La elección de Pydantic AI como primer adaptador ([ADR-013](../forked/decisiones-arquitectura/ADR-013-framework-puente-otel-y-benchmark.md))
+fue por factibilidad medida, **no** es la revisión de arte previo: esa puerta sigue abierta. Lo observado (LangGraph
+ofrece time travel nativo; OpenTelemetry cubre trazas pero no efectos ni evidencia) alimenta la matriz, no la cierra.
+
