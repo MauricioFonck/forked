@@ -61,6 +61,24 @@ Reports integrity (changed / missing / unexpected files, manifest problems) and 
 recomputed from the packaged runs) separately, plus the `package_digest` to compare out of band.
 Exit `0` only if both hold. Symlinks inside a package are rejected.
 
+### forked report
+
+`forked report RUN_ID [BRANCH] [--out FILE] [--open]`
+
+Writes **one self-contained HTML file** (default `forked-report.html`) you open in a browser.
+
+* With only `RUN_ID`: status, capture completeness, missing evidence, the adapter's limitations and the
+  event **timeline**: each event with its effect class, capture status (`captured`, `redacted`, `omitted`)
+  and a collapsible payload.
+* With `BRANCH` as well: the **fork diagram** (the baseline's steps above, the branch below, each branch
+  step coloured by what happened: replayed, intervened, denied, or ran live), the step-by-step table, the
+  outcome changes, the five invariants with what was checked, the claim level, and an evidence package
+  exported and verified on the spot.
+
+The file has no JavaScript, loads nothing from the network, and ships a strict Content-Security-Policy; every
+recorded string is HTML-escaped. The output is deterministic. `--open` opens it in your default browser.
+It contains your recorded data (already redacted), so treat it like the store before sharing it.
+
 ### forked otel-export
 
 `forked otel-export RUN_ID [--out FILE] [--include-payloads]` — OTLP/JSON: one `forked.run` span and

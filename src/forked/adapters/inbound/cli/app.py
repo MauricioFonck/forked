@@ -4,12 +4,15 @@ Exit codes: 0 ok · 1 ``--strict`` found missing evidence · 2 a FORKED error oc
 """
 
 import json
+import tempfile
+import webbrowser
 from pathlib import Path
 from typing import Annotated, Any
 
 import typer
 
 from forked import __version__
+from forked.adapters.inbound.cli.html_report import render_html
 from forked.application.errors import StorageFailure
 from forked.application.queries.inspect_run import RunReport
 from forked.bootstrap.container import Application, build_application, verify_package
@@ -363,6 +366,45 @@ def otel_import(
         raise _fail(exc) from exc
     typer.echo(f"imported {run_id}")
     _print_report(report, show_events=False)
+
+
+@app.command()
+def report(
+    run_id: Annotated[str, typer.Argument(help="Run to show (the baseline when BRANCH is given).")],
+    branch_id: Annotated[
+        str | None,
+        typer.Argument(
+            metavar="[BRANCH]",
+            help="A recorded branch of RUN_ID: adds the fork diagram, comparison and evidence.",
+        ),
+    ] = None,
+    out: Annotated[Path, typer.Option("--out", help="HTML file to write.")] = Path(
+        "forked-report.html"
+    ),
+    open_browser: Annotated[
+        bool, typer.Option("--open", help="Open the report in your browser.")
+    ] = False,
+    store: StoreOption = DEFAULT_STORE,
+) -> None:
+    """Write a self-contained HTML report (no scripts, no network) and optionally open it."""
+    application = _app(store)
+    try:
+        run = application.inspect_run.execute(RunId(run_id))
+        branch = comparison = verification = None
+        if branch_id is not None:
+            branch = application.inspect_run.execute(RunId(branch_id))
+            comparison = application.compare_runs.execute(RunId(run_id), RunId(branch_id))
+            with tempfile.TemporaryDirectory() as tmp:
+                package = Path(tmp) / "evidence"
+                application.export_evidence(RunId(run_id), RunId(branch_id), package)
+                verification = verify_package(package)
+        page = render_html(run, branch, comparison, verification)
+    except ForkedError as exc:
+        raise _fail(exc) from exc
+    out.write_text(page, encoding="utf-8")
+    typer.echo(f"wrote {out}")
+    if open_browser:
+        webbrowser.open(out.resolve().as_uri())
 
 
 @app.command()

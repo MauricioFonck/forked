@@ -34,6 +34,8 @@ is covered by a test in this repository; the limits are listed because they are 
   and its tests and benchmark run with the network blocked. A framework you wrap may: for example,
   LangChain/LangGraph can send traces to LangSmith if you set its tracing environment variables.
   Check your framework's settings; FORKED's local-first guarantee does not extend to it.
+* **The HTML report is a copy of your data.** `forked report` writes what was recorded (already redacted) into a
+  file. It has no scripts and no network access, but treat it like the store before sharing it.
 * **Redaction is pattern-based.** It catches secret-shaped values and sensitive key names; it can miss
   a secret in an unusual form and may over-redact. Do not rely on it for regulated data.
 * **The evidence manifest is not signed.** Integrity means internal consistency, not authorship.

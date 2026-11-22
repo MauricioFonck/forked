@@ -65,6 +65,8 @@ jobs:
           uv run --isolated --no-project --with "$WHEEL" python -m forked record toy-agent
           RUN_ID=$(uv run --isolated --no-project --with "$WHEEL" python -m forked runs | awk '{print $1}')
           uv run --isolated --no-project --with "$WHEEL" python -m forked inspect "$RUN_ID" --strict
+          uv run --isolated --no-project --with "$WHEEL" python -m forked report "$RUN_ID" --out "$RUNNER_TEMP/report.html"
+          grep -q "Content-Security-Policy" "$RUNNER_TEMP/report.html"
       - name: Examples and FCRB benchmark (offline)
         shell: bash
         run: |

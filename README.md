@@ -60,6 +60,7 @@ uv run forked inspect <run_id> --json --strict   # machine-readable; exit 1 if e
 uv run forked replay <run_id>             # re-run the workflow from the recording: 0 tools execute
 uv run forked branch <run_id> --at 3 --value 0.5   # fork: replace the exchange-rate result
 uv run forked compare <run_id> <branch_id> --json  # steps, outcome diff, invariants, claim level
+uv run forked report <run_id> <branch_id> --open   # ONE HTML page: timeline, fork diagram, invariants, evidence
 uv run forked export <run_id> <branch_id> --out evidence/   # manifest + SHA-256 of every artifact
 uv run forked verify evidence/                     # offline; exit 1 on tampering or inflated claims
 ```

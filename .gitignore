@@ -33,3 +33,5 @@ contexto/.obsidian/workspace*.json
 
 # local benchmark output (publish results deliberately, not by accident)
 /results/
+
+forked-report.html

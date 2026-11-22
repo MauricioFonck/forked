@@ -48,8 +48,10 @@
   el email, FORKED 0) y S10 compara tres adaptadores ([ADR-016](decisiones-arquitectura/ADR-016-adaptador-langgraph-y-linea-base.md)).
 - **Primera pasada de arte previo** publicada ([`docs/15`](../../docs/15-prior-art-matrix.md), [ADR-015](decisiones-arquitectura/ADR-015-posicionamiento-tras-el-arte-previo.md)):
   lo básico ya existe; la diferencia se afirma solo como combinación acotada. **Puerta parcialmente abierta.**
-- **281 tests** (1 se salta en Windows: symlinks) (unidad, contrato, seguridad, integración, aceptación, guardianes) + ruff + mypy strict en verde, y
-  57 mutaciones dirigidas detectadas (una sobrevivió y generó un test nuevo, ver la
+- **`forked report`**: un HTML autocontenido (sin JavaScript, CSP estricta, determinista) con línea de tiempo, diagrama del fork,
+  invariantes y evidencia verificada ([ADR-017](decisiones-arquitectura/ADR-017-reporte-html-autocontenido.md)).
+- **293 tests** (1 se salta en Windows: symlinks) (unidad, contrato, seguridad, integración, aceptación, guardianes) + ruff + mypy strict en verde, y
+  60 mutaciones dirigidas detectadas (una sobrevivió y generó un test nuevo, ver la
   [bitácora de la Fase 3](../sesiones/2026-11-21-c-fase-3-ramas.md#6-cómo-verificar)). Comandos en las bitácoras
   ([Fases 0–1](../sesiones/2026-11-21-arranque-fase-0-y-1.md#6-cómo-verificar),
   [Fase 2](../sesiones/2026-11-21-b-publicacion-y-fase-2.md#6-cómo-verificar)).

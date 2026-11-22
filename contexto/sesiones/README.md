@@ -33,6 +33,7 @@ tarea, auditar lo que hizo una IA sin releer todo el diff y correlacionar un fal
 
 | Fecha | Sesión | Rama | Áreas | Impacto | Fallos |
 |---|---|---|---|---|---|
+| 2026-11-22 | [Reporte visual HTML](2026-11-22-h-reporte-visual.md) | `main` | CLI, docs, CI | [2026-11-22 (h)](../impacto/2026-11-22-h-reporte-visual.md) | ninguna |
 | 2026-11-22 | [Arte previo, adaptador de LangGraph y release de la alfa](2026-11-22-g-arte-previo-langgraph-y-release.md) | `main` | docs, adaptador, benchmark, release | [2026-11-22 (g)](../impacto/2026-11-22-g-arte-previo-langgraph-y-release.md) | ninguna |
 | 2026-11-22 | [Fase 6: alfa pública (docs, ejemplos, empaquetado, feedback)](2026-11-22-f-fase-6-alfa-publica.md) | `main` | docs, ejemplos, empaquetado, CI, comunidad | [2026-11-22 (f)](../impacto/2026-11-22-f-fase-6-alfa-publica.md) | ninguna |
 | 2026-11-22 | [Fase 5: adaptador Pydantic AI, puente OTel y benchmark FCRB](2026-11-22-e-fase-5-adaptador-y-benchmark.md) | `main` | SDK, adaptador, dominio, CLI, benchmark, CI | [2026-11-22 (e)](../impacto/2026-11-22-e-fase-5-adaptador-y-benchmark.md) | ninguna |

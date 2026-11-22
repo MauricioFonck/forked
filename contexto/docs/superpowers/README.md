@@ -23,6 +23,7 @@ contexto/docs/superpowers/specs/
 |----|------|------|------|------|-------|--------|
 | 001 | cimientos-del-repositorio | 0 | [spec](specs/001-cimientos-del-repositorio/spec.md) | [plan](specs/001-cimientos-del-repositorio/plan.md) | [tasks](specs/001-cimientos-del-repositorio/tasks.md) | ✅ hecha |
 | 002 | grabador-local | 1 | [spec](specs/002-grabador-local/spec.md) | [plan](specs/002-grabador-local/plan.md) | [tasks](specs/002-grabador-local/tasks.md) | ✅ hecha |
+| 009 | reporte-visual | 6 | [spec](specs/009-reporte-visual/spec.md) | [plan](specs/009-reporte-visual/plan.md) | [tasks](specs/009-reporte-visual/tasks.md) | ✅ hecha |
 | 008 | arte-previo-y-segundo-adaptador | 5–6 | [spec](specs/008-arte-previo-y-segundo-adaptador/spec.md) | [plan](specs/008-arte-previo-y-segundo-adaptador/plan.md) | [tasks](specs/008-arte-previo-y-segundo-adaptador/tasks.md) | ✅ hecha (puerta parcialmente abierta) |
 | 007 | alfa-publica-y-documentacion | 6 | [spec](specs/007-alfa-publica-y-documentacion/spec.md) | [plan](specs/007-alfa-publica-y-documentacion/plan.md) | [tasks](specs/007-alfa-publica-y-documentacion/tasks.md) | ✅ preparada (release pendiente) |
 | 006 | adaptador-y-benchmark | 5 | [spec](specs/006-adaptador-y-benchmark/spec.md) | [plan](specs/006-adaptador-y-benchmark/plan.md) | [tasks](specs/006-adaptador-y-benchmark/tasks.md) | ✅ hecha |

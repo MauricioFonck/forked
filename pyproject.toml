@@ -86,7 +86,8 @@ ignore = ["ANN401", "N818"]
 known-first-party = ["forked", "tests", "examples", "benchmarks"]
 
 [tool.ruff.lint.per-file-ignores]
-"benchmarks/**" = ["E501"]  # report prose and tables; the core keeps the 100-column limit
+"benchmarks/**" = ["E501"]
+"src/forked/adapters/inbound/cli/html_report.py" = ["E501"]  # HTML templates  # report prose and tables; the core keeps the 100-column limit
 "tests/**" = ["S101", "ANN", "S108"]
 
 [tool.mypy]

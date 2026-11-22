@@ -49,6 +49,12 @@ uv run forked export <run_id> <branch_id> --out evidence/
 uv run forked verify evidence/              # offline: integrity and validity, separately
 ```
 
+To **see** all of it in one page (timeline, fork diagram, invariants and the verified evidence):
+
+```bash
+uv run forked report <run_id> <branch_id> --open
+```
+
 What just happened, and what to notice:
 
 * `record` ran the tools for real — but they are local stand-ins: the exchange rate is a fixed

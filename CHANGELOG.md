@@ -5,6 +5,12 @@ Versioning: [SemVer](https://semver.org/) for the package; the CIP schema is ver
 
 ## [Unreleased]
 
+### Added (after 0.1.0a1, unreleased)
+- `forked report RUN_ID [BRANCH] [--out FILE] [--open]`: one self-contained HTML page (no JavaScript, no
+  network, strict Content-Security-Policy, every recorded string escaped, deterministic output) with the event
+  timeline, the fork diagram (baseline vs branch, coloured by replay / intervene / deny / allow), the step
+  table, outcome changes, invariants, claim level and an evidence package verified on the spot.
+
 ### Fixed (after 0.1.0a1, unreleased)
 - Console output is ASCII (a decorative em dash turned into mojibake on Windows); guarded by tests.
 - Getting started: how to keep the run id in a shell variable and how to choose the Python interpreter;
