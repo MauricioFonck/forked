@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[2]
 PAGES = [
     ROOT / "README.md",
     ROOT / "CONTRIBUTING.md",
+    ROOT / "RELEASING.md",
     ROOT / "docs" / "README.md",
     ROOT / "docs" / "15-prior-art-matrix.md",
     ROOT / "examples" / "README.md",
