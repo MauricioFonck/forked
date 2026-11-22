@@ -1,0 +1,112 @@
+{
+  "baseline": "run_2340c74f6442aee366c35ecb7b7b0967",
+  "branch": "run_5d826e8f67cbdf16faffb4f9fb6d1e9b",
+  "branch_status": "completed",
+  "cip_version": "0.1.0",
+  "claim_level": "controlled_comparison",
+  "intervention": {
+    "checkpoint": 3,
+    "id": "int_001",
+    "operation": "replace_recorded_observation",
+    "target": "tool.result",
+    "value": 0.5
+  },
+  "invariants": [
+    {
+      "description": "parent run log is unchanged since the branch was created",
+      "evidence": "branch run.started parent_log_digest=sha256:8e43608bcebce8609d1f98c0339c8a5d0f9cb6e5fd84ba376a82076ef58ca23d; current=sha256:8e43608bcebce8609d1f98c0339c8a5d0f9cb6e5fd84ba376a82076ef58ca23d",
+      "id": "inv_parent_unchanged",
+      "status": "verified",
+      "verification": "content_digest"
+    },
+    {
+      "description": "every call before the checkpoint was answered from the parent recording",
+      "evidence": "1 call(s) before the checkpoint answered from the recording",
+      "id": "inv_prefix_replayed",
+      "status": "verified",
+      "verification": "event_inspection"
+    },
+    {
+      "description": "no tool other than a declared pure_local one executed live in the branch",
+      "evidence": "0 live non-pure_local call(s)",
+      "id": "inv_no_live_side_effects",
+      "status": "verified",
+      "verification": "event_inspection"
+    },
+    {
+      "description": "baseline and branch ran with the same captured environment facts",
+      "evidence": "all captured facts equal",
+      "id": "inv_same_environment",
+      "status": "verified",
+      "verification": "environment_fingerprint"
+    },
+    {
+      "description": "baseline and branch were produced by the same adapter version",
+      "evidence": "forked-toy-agent 0.1.0 vs forked-toy-agent 0.1.0",
+      "id": "inv_same_adapter",
+      "status": "verified",
+      "verification": "adapter_metadata"
+    }
+  ],
+  "missing_evidence": [],
+  "outcome_changes": [
+    {
+      "baseline": 92.0,
+      "branch": 50.0,
+      "field": "converted"
+    },
+    {
+      "baseline": {
+        "accepted": true,
+        "message_file": "message-0001.json"
+      },
+      "branch": {
+        "accepted": false,
+        "denied": "external_write: no recorded observation for these inputs and the default policy denies live execution in a branch"
+      },
+      "field": "email"
+    },
+    {
+      "baseline": 0.92,
+      "branch": 0.5,
+      "field": "rate"
+    }
+  ],
+  "statement": "Observed with all 5 invariants verified: after the intervention, outcome fields changed: converted, email, rate. This describes one recorded run pair; it is not a causal estimate.",
+  "steps": [
+    {
+      "baseline": [
+        "Currency conversions must cite the rate source."
+      ],
+      "branch": [
+        "Currency conversions must cite the rate source."
+      ],
+      "decision": "replay",
+      "index": 1,
+      "status": "same",
+      "tool": "search_policy"
+    },
+    {
+      "baseline": 0.92,
+      "branch": 0.5,
+      "decision": "intervene",
+      "index": 2,
+      "status": "changed",
+      "tool": "get_exchange_rate"
+    },
+    {
+      "baseline": {
+        "accepted": true,
+        "message_file": "message-0001.json"
+      },
+      "branch": {
+        "error_type": "EffectDenied",
+        "message": "external_write: no recorded observation for these inputs and the default policy denies live execution in a branch"
+      },
+      "decision": "deny",
+      "index": 3,
+      "status": "changed",
+      "tool": "send_email"
+    }
+  ]
+}

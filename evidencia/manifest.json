@@ -1,0 +1,101 @@
+{
+  "artifacts": [
+    {
+      "bytes": 3515,
+      "path": "comparison.json",
+      "sha256": "sha256:e8b503b045419cdfd9ae9e253dfe6977e84eb2f3da3ad07aa42ef798129ba3f7"
+    },
+    {
+      "bytes": 3627,
+      "path": "runs/run_2340c74f6442aee366c35ecb7b7b0967/events.jsonl",
+      "sha256": "sha256:4022cc8f5cd9b8018975629711553a906bd53142fc39d15873f1321c17ccf9ba"
+    },
+    {
+      "bytes": 927,
+      "path": "runs/run_2340c74f6442aee366c35ecb7b7b0967/run.json",
+      "sha256": "sha256:e159aa8cf2b5559d83ee89d14a71097d2df69625682875946cd877f81ddaf4f8"
+    },
+    {
+      "bytes": 4410,
+      "path": "runs/run_5d826e8f67cbdf16faffb4f9fb6d1e9b/events.jsonl",
+      "sha256": "sha256:67714e4cef34a148963a9fd5ccb88bdb22cc6439188cdce9b2ee976329fbec95"
+    },
+    {
+      "bytes": 927,
+      "path": "runs/run_5d826e8f67cbdf16faffb4f9fb6d1e9b/run.json",
+      "sha256": "sha256:79047a7aa740cf9198318dcd8dd55796e73f76719b7fd9e927ad2ab956b9705c"
+    }
+  ],
+  "cip_version": "0.1.0",
+  "claim": {
+    "level": "controlled_comparison",
+    "statement": "Observed with all 5 invariants verified: after the intervention, outcome fields changed: converted, email, rate. This describes one recorded run pair; it is not a causal estimate."
+  },
+  "environment": {
+    "baseline": {
+      "adapter": "forked-toy-agent",
+      "adapter_version": "0.1.0",
+      "forked_version": "0.1.0a1",
+      "platform": "Windows-11",
+      "python_implementation": "CPython",
+      "python_version": "3.13.14"
+    },
+    "branch": {
+      "adapter": "forked-toy-agent",
+      "adapter_version": "0.1.0",
+      "forked_version": "0.1.0a1",
+      "platform": "Windows-11",
+      "python_implementation": "CPython",
+      "python_version": "3.13.14"
+    }
+  },
+  "experiment": {
+    "baseline": "run_2340c74f6442aee366c35ecb7b7b0967",
+    "branch": "run_5d826e8f67cbdf16faffb4f9fb6d1e9b",
+    "effects_policy": "default-deny/1",
+    "intervention": {
+      "checkpoint": 3,
+      "id": "int_001",
+      "operation": "replace_recorded_observation",
+      "target": "tool.result",
+      "value": 0.5
+    }
+  },
+  "invariants": [
+    {
+      "id": "inv_parent_unchanged",
+      "status": "verified",
+      "verification": "content_digest"
+    },
+    {
+      "id": "inv_prefix_replayed",
+      "status": "verified",
+      "verification": "event_inspection"
+    },
+    {
+      "id": "inv_no_live_side_effects",
+      "status": "verified",
+      "verification": "event_inspection"
+    },
+    {
+      "id": "inv_same_environment",
+      "status": "verified",
+      "verification": "environment_fingerprint"
+    },
+    {
+      "id": "inv_same_adapter",
+      "status": "verified",
+      "verification": "adapter_metadata"
+    }
+  ],
+  "limitations": [
+    "get_exchange_rate is a local stub with a fixed rate table; no network call is made",
+    "send_email writes to a local outbox directory; no email is sent",
+    "the demo api_key is fake and exists only to demonstrate redaction",
+    "the manifest is not signed: hashes prove the files match it, not who produced them",
+    "the comparison covers one recorded run pair; it is not a causal estimate",
+    "only tool calls made through the FORKED SDK are observed"
+  ],
+  "missing_evidence": [],
+  "package_format": "forked-evidence/1"
+}

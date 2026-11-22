@@ -29,10 +29,16 @@ This runs a small scripted "agent" (convert a currency, check a policy, email fi
 every tool call. It prints a run id (`run_` followed by hex). In Bash you can keep it in a variable:
 
 ```bash
-RUN=$(uv run forked runs | awk '{print $1}')     # first run in a fresh store
+RUN=$(uv run forked record toy-agent | head -1 | awk '{print $2}')   # Bash / macOS / Linux
 ```
 
-The commands below write `<run_id>`; use `$RUN` (or paste the id by hand, e.g. in PowerShell). Then:
+```powershell
+$RUN = (uv run forked record toy-agent | Select-Object -First 1).Split(' ')[1]   # PowerShell
+```
+
+Both take the id from the line `recorded run_...` of **this** recording (do not use `forked runs` for this:
+it lists every run in the store, oldest first). The commands below write `<run_id>`; use `$RUN` or paste the id.
+Then:
 
 ```bash
 uv run forked inspect <run_id> --events     # every event, its effect class and capture status

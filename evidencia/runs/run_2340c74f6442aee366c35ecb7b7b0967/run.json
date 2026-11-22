@@ -1,0 +1,31 @@
+{
+  "schema_version": "0.1.0",
+  "run_id": "run_2340c74f6442aee366c35ecb7b7b0967",
+  "status": "completed",
+  "started_at": "2026-11-22T19:05:30.379236Z",
+  "finished_at": "2026-11-22T19:05:30.399815Z",
+  "reason": null,
+  "next_sequence": 8,
+  "adapter": {
+    "name": "forked-toy-agent",
+    "version": "0.1.0",
+    "capture_points": [
+      "tool:get_exchange_rate",
+      "tool:search_policy",
+      "tool:send_email"
+    ],
+    "limitations": [
+      "get_exchange_rate is a local stub with a fixed rate table; no network call is made",
+      "send_email writes to a local outbox directory; no email is sent",
+      "the demo api_key is fake and exists only to demonstrate redaction"
+    ]
+  },
+  "environment": {
+    "adapter": "forked-toy-agent",
+    "adapter_version": "0.1.0",
+    "forked_version": "0.1.0a1",
+    "platform": "Windows-11",
+    "python_implementation": "CPython",
+    "python_version": "3.13.14"
+  }
+}
