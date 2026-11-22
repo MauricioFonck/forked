@@ -21,3 +21,11 @@ def test_minimal_sdk_example_records_replays_branches_and_denies(
     assert "total: 30.0 -> 37.5" in out
     assert "claim     controlled_comparison" in out
     assert len(minimal_sdk.NOTIFICATIONS) == 1  # the replay and the branch sent nothing new
+
+
+def test_example_output_is_ascii_so_it_survives_any_console(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    minimal_sdk.NOTIFICATIONS.clear()
+    minimal_sdk.main(tmp_path)
+    assert capsys.readouterr().out.isascii()

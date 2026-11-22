@@ -33,6 +33,10 @@ Baselines, **actually executed** against the same scenarios:
   ("API requests … fire again"); it is a different tool for a different purpose (resuming and
   exploring state), so read it as a documented default, not a defect.
 
+The plain-log "replay" is, by construction, re-running the tools: it shows what a log alone cannot do, not that
+logging is badly engineered. A cold-start reviewer rightly called it weak as a comparison, which is one reason
+LangGraph's time travel is executed too.
+
 The other baselines named in `docs/08` §8.4 (generic OTel capture, Temporal, Phoenix) are **listed
 with the reason they were not run** — not run, not claimed.
 
@@ -66,10 +70,22 @@ uv run python -m benchmarks.fcrb --out results/ --no-overhead              # ski
   claims always "controlled", gaps not reported, hashes not compared, …) makes the matching
   scenario fail; `tests/benchmarks/test_fcrb.py` keeps one such check in the suite.
 
+## Reproduction log
+
+| Date | Who | Result | Independent? |
+|---|---|---|---|
+| 2026-11-22 | the author, clean clone | 10/10 `pass` | no |
+| 2026-11-22 | an AI agent with no project context, following only the public docs (same machine) | 10/10 `pass`; `results.json` identical across two runs; a deliberate redaction bug made exactly S09 fail | **no**: not an independent human, so it does **not** satisfy the gate in `docs/08` §8.6 |
+
+It told us the docs need a way to copy the run id, a note on which Python `uv` picks, and an ASCII-only
+console output; all fixed. Add your own row through a
+[reproduction report](https://github.com/MauricioFonck/forked/issues/new?template=reproduction_report.yml).
+
 ## Known limits
 
 * Toy workflows; a scripted model; no real LLM, network or external system.
 * Two executed baselines (LangGraph only for S04). No Temporal, Phoenix or generic-OTel comparison yet.
 * Verification is exercised in a clean directory, not on a separate machine.
-* Capture costs about 2–3 ms per tool call on the author's Windows machine (two events, each
-  flushed) — negligible next to an LLM call, but not free.
+* Capture costs roughly 2–5 ms per tool call (two events, each flushed): the median was 2.4 ms on the
+  author's Windows machine and 5.4 ms in a later run on the same machine under different load. Negligible
+  next to an LLM call, but not free; measure your own workload.

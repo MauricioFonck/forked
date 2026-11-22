@@ -157,3 +157,16 @@ def test_export_and_verify_exit_codes(tmp_path: Path) -> None:
     missing = runner.invoke(app, ["verify", str(tmp_path / "nope")])
     assert missing.exit_code == 2
     assert "error[storage_failure]" in missing.output
+
+
+def test_help_text_of_every_command_is_ascii() -> None:
+    from typer.main import get_command
+
+    names = ["", *get_command(app).commands]  # type: ignore[attr-defined]
+    for name in names:
+        result = runner.invoke(app, [name, "--help"] if name else ["--help"])
+        assert result.exit_code == 0
+        # Rich draws boxes with U+2500..257F and falls back to ASCII on consoles that cannot show
+        # them; any OTHER non-ASCII character is our own text and would turn into mojibake.
+        text = [c for c in result.output if ord(c) > 127 and not 0x2500 <= ord(c) <= 0x257F]
+        assert text == [], f"non-ASCII help text in {name or 'forked'}: {text}"

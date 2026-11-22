@@ -55,6 +55,21 @@ persona independiente que reproduzca el benchmark.
 | release | `pyproject.toml`, `src/forked/__init__.py`, `CITATION.cff`, `CHANGELOG.md`, `uv.lock`, `docs/release-notes/v0.1.0a1.md`, `SECURITY.md`, `README.md` | Versión `0.1.0a1`; notas finalizadas; `SECURITY.md` corregido | Release |
 | CI | `pyproject.toml` | Plugin `langsmith_plugin` desactivado + filtro de advertencia acotado | Python 3.14 |
 
+### Reproducción en frío del benchmark (no independiente)
+
+Tras publicar `v0.1.0a1` se lanzó **un agente de IA sin ningún contexto del proyecto** (instrucciones: solo `README.md`,
+`docs/guide/*` y `benchmarks/README.md`; no leer `contexto/`; trabajar en un directorio temporal; no tocar nada
+público). Resultado: **10/10 `pass`**, `results.json` idéntico en dos corridas (sin `overhead` ni `environment`), y una
+mutación elegida por él (apagar `RedactionPolicy.looks_like_secret`) hizo fallar **exactamente S09**. No encontró
+sobre-afirmaciones; señaló la línea base de logs simples como débil por construcción.
+
+**No cuenta como reproducción independiente** (misma máquina, mismo modelo de IA, sin humano): es una prueba de que la
+documentación se sostiene sola. Fricciones que destapó y se corrigieron: no había forma cómoda de copiar el id de run
+(se añadió una variable de shell), faltaba decir qué Python elige `uv` (`--python`), el costo de captura medido
+(5,4 ms) contradecía el «2–3 ms» publicado (ahora «2–5 ms, varía con la carga»), y la salida de consola tenía una raya
+larga que se corrompía en Windows (`�`; ahora ASCII, con test para la ayuda de la CLI y el ejemplo). Quedó registrado en
+`benchmarks/README.md` («Reproduction log») sin llamarlo independiente.
+
 ## 4. Qué se descartó y por qué
 
 Ver las alternativas de los ADR-015 y ADR-016: seguir diciendo «primer/único», ocultar lo existente, esperar a cerrar
@@ -65,7 +80,8 @@ toda la puerta, envolver herramientas una a una, parchear `ToolNode`, registrar 
 - **PyPI**: no se publicó (requiere tu token y el nombre queda tomado para siempre). Los artefactos están listos y
   validados: `twine check` pasa y la rueda se instala y corre en un entorno limpio, con y sin extras. Comandos exactos en
   el informe de cierre.
-- **Reproducción independiente** del benchmark por una persona ajena (ver el issue de convocatoria).
+- **Reproducción independiente** del benchmark por una persona ajena: issue [#3](https://github.com/MauricioFonck/forked/issues/3)
+  (fijado). La corrida en frío de un agente de IA **no** la sustituye.
 - **Cerrar la puerta de arte previo**: OpenInference, W3C Trace Context, OCI/in-toto, patentes, modelos de datos.
 - Valorar registrar las llamadas al modelo y el estado del grafo.
 

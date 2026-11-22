@@ -55,7 +55,9 @@
 | CP-055 | 3 mutaciones de la documentación (quitar «already done», quitar límites de la matriz, afirmar unicidad) | OK |
 | CP-056 | `python -m benchmarks.fcrb`: 10/10 `pass`; S04 con LangGraph = 1 escritura repetida frente a 0 de FORKED; S10 equivalente en 3 adaptadores | OK |
 | Python 3.14 | suite completa en un venv 3.14 separado antes y después del arreglo | OK: 281 passed (antes: error de colección) |
-| Release | `uv build`, `twine check` (PASSED ×2), rueda en entorno limpio con y sin extras | OK |
+| Release | `uv build`, `twine check` (PASSED ×2), rueda en entorno limpio con y sin extras; rueda **descargada de GitHub**: SHA-256 igual al de las notas, instala y corre | OK |
+| Reproducción en frío | agente de IA sin contexto, solo documentación pública | OK: 10/10; mutación de redacción ⇒ solo S09; 7 fricciones de documentación corregidas (no es reproducción independiente) |
+| Consola | ayuda de la CLI y ejemplo mínimo en ASCII; test que vigila el texto (tolera solo el marco de Rich) y se verificó con una raya larga reintroducida | OK |
 | Estáticos | ruff · format · mypy strict (100 archivos) | OK |
 
 ## 5. Comportamientos nuevos que pasan a protegidos

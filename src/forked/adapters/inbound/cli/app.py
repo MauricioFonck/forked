@@ -21,7 +21,7 @@ from forked.domain.shared.identifiers import RunId
 from forked.domain.telemetry.otlp import InvalidTrace, parse_tool_spans
 
 app = typer.Typer(
-    help="FORKED — record, replay, branch, compare and verify executions. Local-first.",
+    help="FORKED: record, replay, branch, compare and verify executions. Local-first.",
     no_args_is_help=True,
     add_completion=False,
 )

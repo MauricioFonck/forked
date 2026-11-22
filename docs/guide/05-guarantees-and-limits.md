@@ -41,8 +41,8 @@ is covered by a test in this repository; the limits are listed because they are 
   your experiment was well designed. Hash integrity never implies scientific validity.
 * **One intervention type** (replace a tool result), **one effect policy** (`default-deny/1`), one
   experiment (baseline + one branch) per package. No user-approved policies yet.
-* **Capture costs time:** about 2–3 ms per tool call on the author's Windows machine (two events,
-  each flushed). Negligible next to an LLM call, but measure your own workload.
+* **Capture costs time:** roughly 2–5 ms per tool call (two events, each flushed; it varied with load
+  on the author's Windows machine). Negligible next to an LLM call, but measure your own workload.
 * **Pre-alpha.** Formats may change before 1.0 (the event schema is versioned and has golden
   fixtures; the package format is `forked-evidence/1`). The benchmark that exercises all this is
   provisional and **has not been independently reproduced**.

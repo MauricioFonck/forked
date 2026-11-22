@@ -5,6 +5,12 @@ Versioning: [SemVer](https://semver.org/) for the package; the CIP schema is ver
 
 ## [Unreleased]
 
+### Fixed (after 0.1.0a1, unreleased)
+- Console output is ASCII (a decorative em dash turned into mojibake on Windows); guarded by tests.
+- Getting started: how to keep the run id in a shell variable and how to choose the Python interpreter;
+  the capture-cost figure is now "roughly 2-5 ms, varies with load".
+- Benchmark README: a reproduction log (author; a cold-start AI agent, explicitly **not** independent).
+
 ## [0.1.0a1] - 2026-11-22
 
 First public alpha. Pre-alpha quality: see the [release notes](docs/release-notes/v0.1.0a1.md).

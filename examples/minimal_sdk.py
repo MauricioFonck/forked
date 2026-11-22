@@ -70,7 +70,7 @@ def main(workdir: Path | None = None) -> None:
     for field, before, after in result.outcome_changes:
         print(f"branch    {field}: {before} -> {after}")
     print(f"claim     {result.claim_level} (one run pair; not a causal estimate)")
-    print(f"sent      {len(NOTIFICATIONS)} notification(s) in total — the branch's was denied")
+    print(f"sent      {len(NOTIFICATIONS)} notification(s) in total; the branch's was denied")
 
 
 if __name__ == "__main__":

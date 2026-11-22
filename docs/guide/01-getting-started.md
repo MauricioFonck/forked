@@ -13,6 +13,9 @@ uv sync --locked          # core + dev tools; pinned by uv.lock
 uv run forked --version
 ```
 
+`uv` picks a compatible interpreter (3.11–3.14) by itself. To choose one:
+`uv sync --locked --python 3.12`.
+
 The core depends only on `pydantic` and `typer`. Framework adapters are **optional extras**
 (`forked-runtime[pydantic-ai]`, `forked-runtime[langgraph]`); the core never imports them.
 
@@ -23,12 +26,18 @@ uv run forked record toy-agent
 ```
 
 This runs a small scripted "agent" (convert a currency, check a policy, email finance) and records
-every tool call. Copy the run id it prints, then:
+every tool call. It prints a run id (`run_` followed by hex). In Bash you can keep it in a variable:
+
+```bash
+RUN=$(uv run forked runs | awk '{print $1}')     # first run in a fresh store
+```
+
+The commands below write `<run_id>`; use `$RUN` (or paste the id by hand, e.g. in PowerShell). Then:
 
 ```bash
 uv run forked inspect <run_id> --events     # every event, its effect class and capture status
 uv run forked replay <run_id>               # re-run it from the recording: 0 tools execute
-uv run forked branch <run_id> --at 3 --value 0.5   # fork: replace the exchange-rate result
+uv run forked branch <run_id> --at 3 --value 0.5   # fork: replace the exchange-rate result; prints the branch id
 uv run forked compare <run_id> <branch_id>  # what changed, which invariants hold, claim level
 uv run forked export <run_id> <branch_id> --out evidence/
 uv run forked verify evidence/              # offline: integrity and validity, separately
