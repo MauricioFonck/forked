@@ -159,7 +159,9 @@ Know the limits:
 * a tool that returns a `Command` is rejected loudly; an undeclared tool is `unknown`;
 * a tool exception propagates as it would without FORKED; replaying it raises `RecordedToolError`;
 * `on_denied="raise"` (default) aborts the graph on a denied call; `"report"` returns an explicit error
-  `ToolMessage` to the model. It is never faked as a success.
+  `ToolMessage` to the model. It is never faked as a success;
+* LangChain can send traces to LangSmith if you enable its tracing environment variables. FORKED does
+  not enable it and sends nothing itself, but it cannot switch off a framework's own telemetry.
 
 ## OpenTelemetry
 

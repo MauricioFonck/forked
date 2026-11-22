@@ -30,6 +30,10 @@ is covered by a test in this repository; the limits are listed because they are 
 * **Pydantic AI and LangGraph:** model requests (and, in LangGraph, every non-tool node and the graph
   state) are not recorded, and a real LLM usually diverges on replay. See
   [4. Instrumenting your workflow](04-instrumenting-your-workflow.md).
+* **The frameworks you instrument may have their own telemetry.** FORKED never sends data anywhere,
+  and its tests and benchmark run with the network blocked. A framework you wrap may: for example,
+  LangChain/LangGraph can send traces to LangSmith if you set its tracing environment variables.
+  Check your framework's settings; FORKED's local-first guarantee does not extend to it.
 * **Redaction is pattern-based.** It catches secret-shaped values and sensitive key names; it can miss
   a secret in an unusual form and may over-redact. Do not rely on it for regulated data.
 * **The evidence manifest is not signed.** Integrity means internal consistency, not authorship.

@@ -63,9 +63,15 @@ include = ["src", "tests", "spec", "examples", "benchmarks", "LICENSE", "README.
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-ra --strict-markers"
+# langsmith (a transitive dependency of LangChain) ships a pytest plugin we do not use; on Python 3.14
+# it raises a DeprecationWarning at import time, which `filterwarnings = error` turns into a crash.
+addopts = "-ra --strict-markers -p no:langsmith_plugin"
 pythonpath = ["."]
-filterwarnings = ["error"]
+filterwarnings = [
+  "error",
+  # Third-party, optional (LangChain -> langsmith) and only on Python 3.14: scoped by message AND origin.
+  "ignore:'asyncio.iscoroutinefunction' is deprecated.*:DeprecationWarning:langsmith",
+]
 
 [tool.ruff]
 line-length = 100
