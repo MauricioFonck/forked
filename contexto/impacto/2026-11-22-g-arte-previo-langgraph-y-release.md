@@ -17,6 +17,8 @@
 | Dependencias | extra `langgraph` + grupo `dev` (+38 paquetes de desarrollo); `uv.lock` | CI (6 trabajos), contribuyentes |
 | SDK | `RecordedToolError.message` (atributo nuevo) | adaptadores |
 | Benchmark | S04 (línea base LangGraph), S10 (3 adaptadores), `common.normalized_tool_events(parse_json_outputs=)`, versiones en `results.json` | tests del benchmark, guía 06 |
+| Release | versión `0.1.0a1` en 5 archivos + `uv.lock`; `SECURITY.md`; notas de versión renombradas (`v0.1.0-alpha.1.md` → `v0.1.0a1.md`) | PyPI (futuro), citas, usuarios |
+| CI / pytest | `-p no:langsmith_plugin` y un filtro de advertencia acotado | los 6 trabajos, sobre todo Python 3.14 |
 | Ejemplos | herramientas compartidas en `examples/expense_tools.py`; el ejemplo de Pydantic AI las importa | tests, benchmark |
 
 ## 2. Qué funciona hoy y qué le podría pasar
@@ -38,6 +40,9 @@
 - **Mutación sobreviviente**: ningún test exigía que, grabando, el agente recibiera el `ToolMessage` original. Test nuevo.
 - Mis dos tests iniciales de LangGraph eran erróneos (un `Command` inválido lo rechaza LangGraph antes del envoltorio; el
   test del extra ausente debía bloquear también los submódulos cacheados): corregidos antes de commitear.
+- **`SECURITY.md` estaba desactualizado desde la Fase 0** (decía que replay, ramas y evidencia no existían): corregido y
+  enlazado a la guía de garantías.
+- **Python 3.14**: una dependencia transitiva de LangChain rompía pytest solo en esa versión (ver la bitácora).
 - Mi tabla inicial de la matriz afirmaba cosas generales (Phoenix «basado en OTel», «local-first» de otras plataformas)
   que **no verifiqué**: se marcaron «not read».
 
@@ -49,6 +54,8 @@
 | CP-052…054 | 12 tests de LangGraph con la red bloqueada + 5 mutaciones del adaptador | OK: 4 detectadas de inicio, 1 tras añadir el test de fidelidad |
 | CP-055 | 3 mutaciones de la documentación (quitar «already done», quitar límites de la matriz, afirmar unicidad) | OK |
 | CP-056 | `python -m benchmarks.fcrb`: 10/10 `pass`; S04 con LangGraph = 1 escritura repetida frente a 0 de FORKED; S10 equivalente en 3 adaptadores | OK |
+| Python 3.14 | suite completa en un venv 3.14 separado antes y después del arreglo | OK: 281 passed (antes: error de colección) |
+| Release | `uv build`, `twine check` (PASSED ×2), rueda en entorno limpio con y sin extras | OK |
 | Estáticos | ruff · format · mypy strict (100 archivos) | OK |
 
 ## 5. Comportamientos nuevos que pasan a protegidos

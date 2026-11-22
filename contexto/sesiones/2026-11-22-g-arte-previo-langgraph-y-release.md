@@ -25,6 +25,14 @@ persona independiente que reproduzca el benchmark.
 - Arte previo: ver [ADR-015](../forked/decisiones-arquitectura/ADR-015-posicionamiento-tras-el-arte-previo.md) y [`docs/15`](../../docs/15-prior-art-matrix.md).
   Lo básico ya existe; el README se reescribió para reconocerlo.
 - LangGraph: ver [ADR-016](../forked/decisiones-arquitectura/ADR-016-adaptador-langgraph-y-linea-base.md). Su viaje en el tiempo repitió el email (1 → 2).
+- **`SECURITY.md` seguía diciendo «replay, ramas y exportación de evidencia no están implementados»** desde la Fase 0:
+  falso hacía cinco fases y justo en la política de seguridad. Reescrito (garantías con enlace a la guía, alcance de
+  «bypass», telemetría de frameworks).
+- **CI en Python 3.14**: `langsmith` (dependencia transitiva de LangChain) trae un plugin de pytest y un
+  `DeprecationWarning` que, con `filterwarnings = error`, tumbaba pytest solo en 3.14. Reproducido en un venv 3.14
+  local; arreglado con el plugin desactivado y un filtro acotado por mensaje y por módulo de origen.
+- **Telemetría de terceros**: LangChain puede enviar trazas a LangSmith si el usuario activa sus variables; FORKED no
+  envía nada, pero eso no cubre al framework envuelto. Ahora lo dicen la guía y `SECURITY.md`.
 - Una mutación sobrevivió y generó un test; dos tests míos estaban mal (corregidos); la tabla inicial de la matriz tenía
   celdas no verificadas (marcadas «not read»); un comando de shell con heredocs anidados falló al analizarse y no aplicó
   nada (rehecho con herramientas de archivo).
@@ -43,7 +51,9 @@ persona independiente que reproduzca el benchmark.
 | dependencias | `pyproject.toml`, `uv.lock` | extra `langgraph` | ADR-016 |
 | docs | `README.md`, `CHANGELOG.md`, `docs/guide/04,05,06`, `examples/README.md`, `benchmarks/README.md` | LangGraph y línea base | Honestidad pública |
 | contexto | ADR-015/016, spec 008, CP-052…056, estado, roadmap, memoria central, índices | Memoria | Método |
-| GitHub | repositorio | Discussions habilitado | Decisión del dueño |
+| GitHub | repositorio | Discussions habilitado; etiquetas; **pre-release `v0.1.0a1`**; issues de convocatoria | Decisión del dueño |
+| release | `pyproject.toml`, `src/forked/__init__.py`, `CITATION.cff`, `CHANGELOG.md`, `uv.lock`, `docs/release-notes/v0.1.0a1.md`, `SECURITY.md`, `README.md` | Versión `0.1.0a1`; notas finalizadas; `SECURITY.md` corregido | Release |
+| CI | `pyproject.toml` | Plugin `langsmith_plugin` desactivado + filtro de advertencia acotado | Python 3.14 |
 
 ## 4. Qué se descartó y por qué
 
@@ -52,7 +62,9 @@ toda la puerta, envolver herramientas una a una, parchear `ToolNode`, registrar 
 
 ## 5. Qué quedó pendiente / decisiones para el usuario
 
-- **PyPI**: no se publicó (requiere tu token y el nombre queda tomado para siempre).
+- **PyPI**: no se publicó (requiere tu token y el nombre queda tomado para siempre). Los artefactos están listos y
+  validados: `twine check` pasa y la rueda se instala y corre en un entorno limpio, con y sin extras. Comandos exactos en
+  el informe de cierre.
 - **Reproducción independiente** del benchmark por una persona ajena (ver el issue de convocatoria).
 - **Cerrar la puerta de arte previo**: OpenInference, W3C Trace Context, OCI/in-toto, patentes, modelos de datos.
 - Valorar registrar las llamadas al modelo y el estado del grafo.
@@ -68,6 +80,10 @@ uv run pytest                       # 281 passed, 1 skipped (symlink en Windows)
 uv run python -m examples.langgraph_expense_agent
 uv run python -m benchmarks.fcrb --out results/   # 10 pass; S04 incluye la línea base de LangGraph
 ```
+
+Release (verificado antes de etiquetar): `uv build` → rueda 77 KB y sdist 130 KB; `uvx twine check dist/*` PASSED;
+rueda instalada con `[langgraph]` ⇒ el adaptador de Pydantic AI da el error accionable (los extras están aislados);
+CI en verde en 6 trabajos (Linux 3.11–3.14, Windows, macOS).
 
 Mutaciones del adaptador de LangGraph (aplicadas y revertidas): clase de efecto por defecto `pure_local` (detectada) ·
 `on_denied` ignorado (detectada) · mensaje original descartado (**sobrevivió** → test de fidelidad → detectada) ·

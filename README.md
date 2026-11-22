@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/forked-hero.png" alt="One execution branching into several controlled alternatives" width="100%">
+  <img src="https://raw.githubusercontent.com/MauricioFonck/forked/main/assets/forked-hero.png" alt="One execution branching into several controlled alternatives" width="100%">
 </p>
 
 <h1 align="center">FORKED</h1>
@@ -195,7 +195,7 @@ Event schema v0.1.0: [`spec/cip/v0.1/event.schema.json`](spec/cip/v0.1/event.sch
 [instrumenting your workflow](docs/guide/04-instrumenting-your-workflow.md) ·
 [guarantees and limits](docs/guide/05-guarantees-and-limits.md) ·
 [reproducing and reviewing](docs/guide/06-reproducing-and-reviewing.md) ·
-[release notes (draft)](docs/release-notes/v0.1.0-alpha.1.md).
+[release notes](docs/release-notes/v0.1.0a1.md).
 
 **Design documents** (why it is built this way):
 

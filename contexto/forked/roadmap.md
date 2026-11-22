@@ -15,7 +15,7 @@
 | 3 · Ramas | Linaje inmutable, una intervención, stream por rama, comparación, invariantes | Padre intacto; intervención en la evidencia; desconocido nunca se marca verificado | ✅ 2026-11-21 ([spec 004](../docs/superpowers/specs/004-ramas-e-intervencion/spec.md)) |
 | 4 · Evidencia | Manifiesto, SHA-256, exportación determinista, verificador offline | Detecta artefactos cambiados/faltantes; separa integridad de validez | ✅ 2026-11-21 ([spec 005](../docs/superpowers/specs/005-paquete-de-evidencia/spec.md)) |
 | 5 · Adaptador y benchmark | Puente OTel, un adaptador de framework, escenarios FCRB, runner reproducible | Un caso end-to-end documentado; reproducción independiente | ✅ 2026-11-22 ([spec 006](../docs/superpowers/specs/006-adaptador-y-benchmark/spec.md)); **falta** la reproducción independiente |
-| 6 · Alfa pública | Sitio de docs, repo de ejemplo, plantillas, notas de versión, feedback | — | ✅ preparada 2026-11-22, **release pendiente** ([spec 007](../docs/superpowers/specs/007-alfa-publica-y-documentacion/spec.md)) (adelantado: CONTRIBUTING, SECURITY, plantillas de issues y PR) |
+| 6 · Alfa pública | Sitio de docs, repo de ejemplo, plantillas, notas de versión, feedback | — | ✅ 2026-11-22: pre-release `v0.1.0a1` en GitHub (PyPI pendiente del dueño) ([spec 007](../docs/superpowers/specs/007-alfa-publica-y-documentacion/spec.md)) (adelantado: CONTRIBUTING, SECURITY, plantillas de issues y PR) |
 
 ## Adelantos hechos fuera de orden (y por qué)
 

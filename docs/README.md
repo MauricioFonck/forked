@@ -17,7 +17,7 @@ Start here if you want to run it or instrument your own code. These pages descri
 | [6. Reproducing and reviewing](guide/06-reproducing-and-reviewing.md) | Reproduce the benchmark, review the project, report back |
 
 Runnable examples: [`examples/`](../examples/README.md). Benchmark: [`benchmarks/`](../benchmarks/README.md).
-Release notes: [`release-notes/`](release-notes/v0.1.0-alpha.1.md) and the [CHANGELOG](../CHANGELOG.md).
+Release notes: [`release-notes/`](release-notes/v0.1.0a1.md) and the [CHANGELOG](../CHANGELOG.md).
 
 ## Design documents — why it is built this way
 

@@ -15,7 +15,7 @@
 | 3 | Ramas, una intervención, política default-deny, invariantes, comparación | ✅ Hecha | [004](../docs/superpowers/specs/004-ramas-e-intervencion/spec.md) |
 | 4 | Paquete de evidencia + verificador offline | ✅ Hecha | [005](../docs/superpowers/specs/005-paquete-de-evidencia/spec.md) |
 | 5 | Puente OpenTelemetry, primer adaptador de framework (Pydantic AI), FCRB | ✅ Hecha (sin reproducción independiente) | [006](../docs/superpowers/specs/006-adaptador-y-benchmark/spec.md) |
-| 6 | Alfa pública y comunidad | ✅ Preparada; **release pendiente de decisión del dueño** | [007](../docs/superpowers/specs/007-alfa-publica-y-documentacion/spec.md) |
+| 6 | Alfa pública y comunidad | ✅ Hecha: pre-release `v0.1.0a1` en GitHub (sin PyPI) | [007](../docs/superpowers/specs/007-alfa-publica-y-documentacion/spec.md) |
 
 ## Qué funciona hoy (verificado)
 
@@ -67,7 +67,7 @@
 
 ## Próximo paso
 
-**Decisión del dueño sobre el release** (etiquetar `v0.1.0-alpha.1`, GitHub Release, ¿PyPI?, Discussions): ver la
-[bitácora de la Fase 6](../sesiones/2026-11-22-f-fase-6-alfa-publica.md#5-qué-quedó-pendiente--decisiones-para-el-usuario).
+El release `v0.1.0a1` está **publicado como pre-release en GitHub** y Discussions está habilitado; **PyPI no** (requiere
+el token del dueño). Ver la [bitácora](../sesiones/2026-11-22-g-arte-previo-langgraph-y-release.md#5-qué-quedó-pendiente--decisiones-para-el-usuario).
 Después, por valor: la **matriz de arte previo** (puerta abierta), una **reproducción independiente** del benchmark y
 un segundo adaptador (LangGraph) con su línea base de viaje en el tiempo nativo.

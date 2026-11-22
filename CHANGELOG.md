@@ -5,6 +5,10 @@ Versioning: [SemVer](https://semver.org/) for the package; the CIP schema is ver
 
 ## [Unreleased]
 
+## [0.1.0a1] - 2026-11-22
+
+First public alpha. Pre-alpha quality: see the [release notes](docs/release-notes/v0.1.0a1.md).
+
 ### Added
 - Phase 0: repository foundation — hexagonal package layout, CI (Linux/Windows/macOS,
   Python 3.11–3.14), Apache-2.0 license, security/contribution/governance policies.
