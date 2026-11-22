@@ -14,6 +14,7 @@ from pydantic_ai.models.function import AgentInfo, FunctionModel
 from pydantic_ai.toolsets import FunctionToolset
 
 from benchmarks.fcrb.common import normalized_tool_events
+from examples import expense_tools as shared
 from examples import pydantic_ai_expense_agent as expense
 from forked.adapters.inbound.frameworks.pydantic_ai_toolset import ForkedToolset
 from forked.bootstrap.container import Application
@@ -93,7 +94,7 @@ def test_branch_denies_the_changed_email_and_reports_it_to_the_model(
     outbox = tmp_path / "outbox"
     baseline = _record(app, outbox)
     branch = expense.run_expense_agent(
-        app.recorder.branch(baseline, expense.CAPABILITIES, Intervention(expense.RATE_CALL, 0.5)),
+        app.recorder.branch(baseline, expense.CAPABILITIES, Intervention(shared.RATE_CALL, 0.5)),
         outbox,
     )
     result = app.compare_runs.execute(baseline, branch)
@@ -118,14 +119,14 @@ def test_denial_can_abort_the_run_instead(app: Application, tmp_path: Path) -> N
 
     def abort(run: Any) -> Any:
         return ForkedToolset(
-            FunctionToolset(expense.build_tools(outbox)), run, expense.EFFECTS, on_denied="raise"
+            FunctionToolset(shared.build_tools(outbox)), run, shared.EFFECTS, on_denied="raise"
         )
 
     state: dict[str, Any] = {}
     with (  # noqa: PT012
         pytest.raises(EffectDenied),
         app.recorder.branch(
-            baseline, expense.CAPABILITIES, Intervention(expense.RATE_CALL, 0.5)
+            baseline, expense.CAPABILITIES, Intervention(shared.RATE_CALL, 0.5)
         ) as run,
     ):
         agent = Agent(FunctionModel(expense._script(100.0, state)), toolsets=[abort(run)])

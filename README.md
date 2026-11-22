@@ -28,9 +28,9 @@ changed, and **what remains unknown**.
 
 > **Status — honest version.** Pre-alpha. **Recording, inspection, replay, branching with one
 > intervention, default-deny effects, baseline-vs-branch comparison and offline-verifiable
-> evidence packages work and are tested** on toy workflows, including one agent built with
-> Pydantic AI and an OpenTelemetry export/import bridge. A first reproducible benchmark runs offline.
-> No other framework adapter yet. Nothing here is scientifically validated yet. See [roadmap](#roadmap).
+> evidence packages work and are tested** on toy workflows, including agents built with
+> Pydantic AI and LangGraph and an OpenTelemetry export/import bridge. A first reproducible
+> benchmark runs offline. Nothing here is scientifically validated yet. See [roadmap](#roadmap).
 
 ## 60-second demo
 
@@ -105,9 +105,10 @@ the new email above is **denied, not sent, and not faked**. `compare` marks ever
 
 ```bash
 uv run python -m examples.pydantic_ai_expense_agent   # a Pydantic AI agent: record, replay, branch, verify
+uv run python -m examples.langgraph_expense_agent     # the same agent as a LangGraph graph
 uv run forked otel-export <run_id> --out trace.json   # tool spans as OTLP/JSON (payloads only with --include-payloads)
 uv run forked otel-import trace.json                  # a trace becomes a run: every effect is `unknown` (denied)
-uv run python -m benchmarks.fcrb --out results/       # 10 scenarios + a plain-log baseline, offline
+uv run python -m benchmarks.fcrb --out results/       # 10 scenarios + two executed baselines, offline
 ```
 
 [`examples/`](examples/README.md) walks through the agent; [`benchmarks/`](benchmarks/README.md)
@@ -164,7 +165,7 @@ bytes did not change — not that a conclusion is true.
 | 2 | Replay of recorded observations, fail closed, no tool executes | ✅ done |
 | 3 | Branch lineage, one intervention type, default-deny effect policy, invariants, comparison | ✅ done |
 | 4 | Evidence package (SHA-256 manifest) + offline verifier | ✅ done |
-| 5 | OpenTelemetry bridge, first framework adapter (Pydantic AI), FCRB benchmark | ✅ done (not independently reproduced) |
+| 5 | OpenTelemetry bridge, framework adapters (Pydantic AI, LangGraph), FCRB benchmark | ✅ done (not independently reproduced) |
 | 6 | Public alpha, docs site, community | 🛠 next |
 
 Details and exit criteria: [`docs/09-roadmap-and-backlog.md`](docs/09-roadmap-and-backlog.md).

@@ -31,6 +31,7 @@ dependencies = [
 [project.optional-dependencies]
 # Framework adapters are opt-in: the core never imports them (ADR-013).
 pydantic-ai = ["pydantic-ai-slim>=2.71,<3"]
+langgraph = ["langgraph>=1.2,<2"]
 
 [project.scripts]
 forked = "forked.adapters.inbound.cli.app:main"
@@ -46,6 +47,7 @@ dev = [
   "ruff>=0.6",
   "mypy>=1.11",
   "pydantic-ai-slim>=2.71,<3",
+  "langgraph>=1.2,<2",
 ]
 
 [build-system]

@@ -12,6 +12,7 @@
 |---|---|
 | `benchmarks/fcrb/scenarios.py` | S01…S10; cada uno devuelve `ScenarioResult` (métricas medidas, línea base, notas) |
 | `benchmarks/fcrb/baseline.py` | línea base «logs simples» **ejecutada** + la lista de líneas base no ejecutadas con su motivo |
+| `benchmarks/fcrb/baseline_langgraph.py` | línea base del viaje en el tiempo de LangGraph **ejecutada** (solo S04) |
 | `benchmarks/fcrb/runner.py` | `run_all`, `measure_overhead`, `deterministic_view`, `render_report`, `main` |
 | `benchmarks/fcrb/common.py` | `normalized_tool_events` (equivalencia entre adaptadores) |
 | `tests/benchmarks/test_fcrb.py` | corre los escenarios, exige reproducibilidad y que **pueda fallar** |
@@ -22,7 +23,9 @@
 
 - Métricas separadas, **sin puntaje único** (`docs/08` §8.3). Un escenario que revienta es `fail`, no aborta.
 - Solo `overhead` y `environment` varían entre corridas; lo demás es determinista (test).
-- Cada línea base no ejecutada se lista con el motivo; nada se «compara» sin haberse ejecutado.
+- Cada línea base no ejecutada se lista con el motivo; nada se «compara» sin haberse ejecutado. Hoy se ejecutan dos:
+  logs simples (S04, S06, S08, S09) y viaje en el tiempo de LangGraph (S04), y esta última se presenta como *otra
+  herramienta con otro propósito*, no como un defecto.
 - El benchmark **debe poder fallar**: 9 mutaciones del producto, cada una detectada por su escenario
   ([bitácora](../../sesiones/2026-11-22-e-fase-5-adaptador-y-benchmark.md#6-cómo-verificar)).
 
@@ -35,9 +38,9 @@ CPU y memoria no se miden.
 
 ## Límites declarados
 
-Flujos de juguete con modelo guionado; una sola línea base ejecutada; verificación en un directorio limpio, no en otra
+Flujos de juguete con modelo guionado; dos líneas base ejecutadas (LangGraph solo en S04); verificación en un directorio limpio, no en otra
 máquina; **sin reproducción independiente** ⇒ no se puede llamar «validado» (`docs/08` §8.6).
 
 ## Comportamientos protegidos
 
-CP-045 y CP-046 en [comportamientos protegidos](../../impacto/comportamientos-protegidos.md).
+CP-045, CP-046 y CP-056 en [comportamientos protegidos](../../impacto/comportamientos-protegidos.md).

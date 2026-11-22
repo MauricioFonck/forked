@@ -24,6 +24,8 @@ Añade una entrada cuando tomes una decisión arquitectónica relevante, con la 
 | [007](ADR-007-omitir-no-truncar.md) | Payload grande: omitir con digest, nunca truncar; sobre-redacción aceptada | Vigente | `application/capture.py` |
 | [008](ADR-008-toolchain.md) | uv + hatchling, Python ≥ 3.11, Pydantic solo en el borde | Vigente | `pyproject.toml`, `uv.lock` |
 | [009](ADR-009-secuencia-ids-tiempo.md) | Secuencia contigua desde 0, ids aleatorios, tiempo UTC con zona | Vigente | `domain/runs/run.py`, `domain/runs/sequence.py` |
+| [016](ADR-016-adaptador-langgraph-y-linea-base.md) | Adaptador de LangGraph por `wrap_tool_call`; su viaje en el tiempo como línea base medida | Vigente | `adapters/inbound/frameworks/langgraph_toolnode.py`, `benchmarks/fcrb/baseline_langgraph.py` |
+| [015](ADR-015-posicionamiento-tras-el-arte-previo.md) | Posicionamiento tras el arte previo: capa de seguridad y evidencia, no «el grabador»; diferencia solo como combinación acotada | Vigente | `docs/15-prior-art-matrix.md`, `tests/guardians/test_public_docs.py` |
 | [014](ADR-014-documentacion-publica-y-puerta-de-release.md) | Documentación pública verificada por tests; sin release sin decisión del dueño | Vigente | `tests/guardians/test_public_docs.py`, `docs/guide/` |
 | [013](ADR-013-framework-puente-otel-y-benchmark.md) | Pydantic AI primero (por factibilidad, sin datos de demanda); puente OTLP/JSON sin SDK de OTel; benchmark que debe poder fallar | Vigente | `adapters/inbound/frameworks/`, `domain/telemetry/`, `benchmarks/` |
 | [012](ADR-012-paquete-de-evidencia.md) | Paquete = directorio determinista; integridad y validez separadas; validez por recálculo; sin firma | Vigente | `domain/evidence/package.py`, `tests/acceptance/test_evidence.py` |

@@ -115,6 +115,52 @@ Know the limits before relying on it:
 * a call denied in a branch aborts the agent (`on_denied="raise"`, default) or is reported to the
   model as an explicit denial (`on_denied="report"`). It is never faked as a success.
 
+## LangGraph
+
+```bash
+uv sync --locked                       # the dev group includes it; users: pip install 'forked-runtime[langgraph]'
+```
+
+```python
+from langgraph.graph import StateGraph
+
+from forked.adapters.inbound.frameworks.langgraph_toolnode import (
+    forked_tool_node,
+    langgraph_capabilities,
+)
+
+EFFECTS = {"search_policy": EffectClass.PURE_LOCAL, "send_email": EffectClass.EXTERNAL_WRITE}
+
+with app.recorder.record(langgraph_capabilities(EFFECTS)) as run:  # or .replay / .branch
+    graph = StateGraph(MessagesState)
+    graph.add_node("agent", my_model_node)
+    graph.add_node("tools", forked_tool_node(tools, run, EFFECTS))  # instead of ToolNode(tools)
+    ...  # edges as usual
+    graph.compile().invoke({"messages": [...]})
+```
+
+`ToolNode` has `wrap_tool_call` / `awrap_tool_call` hooks, so one wrapper pair is the only seam.
+A complete graph with a scripted model is [`examples/langgraph_expense_agent.py`](../../examples/langgraph_expense_agent.py).
+
+How it differs from LangGraph's own time travel: LangGraph resumes from a checkpoint and
+**re-executes the nodes after it, including their tool calls** (its documentation says so; the
+benchmark's S04 measured the email being sent again). FORKED answers a replayed tool call from the
+recording and never executes it. They solve different problems and can be used together.
+
+Know the limits:
+
+* only calls handled by the wrapped `ToolNode` are recorded — not the model node, other nodes or the
+  graph state; replay and branches re-run those nodes live, so they must request the same tool calls
+  or the replay **fails closed**;
+* tool results are the **text/list content LangGraph produces** (`"0.92"`, not `0.92`). Recording
+  returns the original `ToolMessage` untouched; a replayed result is rebuilt from the recorded
+  **content only** (no `artifact`);
+* the calls of one step are serialized by a lock and recorded in the order `ToolNode` schedules them;
+* a tool that returns a `Command` is rejected loudly; an undeclared tool is `unknown`;
+* a tool exception propagates as it would without FORKED; replaying it raises `RecordedToolError`;
+* `on_denied="raise"` (default) aborts the graph on a denied call; `"report"` returns an explicit error
+  `ToolMessage` to the model. It is never faked as a success.
+
 ## OpenTelemetry
 
 `forked otel-export` turns a run into tool spans; `forked otel-import` turns a trace into a run. An

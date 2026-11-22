@@ -22,11 +22,19 @@ one score**.
 | S07 | Environment version mismatch | mismatch detected, claim downgraded |
 | S08 | Tampered evidence artifact | byte tampering vs. re-hashed forgery; integrity vs. validity; evidence completeness |
 | S09 | Sensitive field redaction | secret occurrences in the store, the evidence package and an OTel export |
-| S10 | Two adapters producing equivalent protocol artifacts | native SDK vs. Pydantic AI adapter: equivalent tool events |
+| S10 | Several adapters producing equivalent protocol artifacts | native SDK vs. the Pydantic AI and LangGraph adapters: equivalent tool events |
 
-Baseline: **plain application logs**, actually executed against the same scenarios (a naive
-"replay" re-runs the tools; a tampered or truncated log still parses). The other baselines named in
-`docs/08` §8.4 are **listed with the reason they were not run** — not run, not claimed.
+Baselines, **actually executed** against the same scenarios:
+
+* **plain application logs** (S04, S06, S08, S09): a naive "replay" re-runs the tools; a tampered or
+  truncated log still parses; the secret is in the log in clear;
+* **LangGraph time travel** (S04 only): resuming from the checkpoint before `send_email` ran the
+  email again (1 → 2). That is what LangGraph's documentation says nodes after a checkpoint do
+  ("API requests … fire again"); it is a different tool for a different purpose (resuming and
+  exploring state), so read it as a documented default, not a defect.
+
+The other baselines named in `docs/08` §8.4 (generic OTel capture, Temporal, Phoenix) are **listed
+with the reason they were not run** — not run, not claimed.
 
 Overhead: capture latency (median and p95 after a discarded warm-up), storage per event. CPU and
 memory are **not** measured.
@@ -61,7 +69,7 @@ uv run python -m benchmarks.fcrb --out results/ --no-overhead              # ski
 ## Known limits
 
 * Toy workflows; a scripted model; no real LLM, network or external system.
-* One executed baseline. No Temporal, LangGraph, Phoenix or generic-OTel comparison yet.
+* Two executed baselines (LangGraph only for S04). No Temporal, Phoenix or generic-OTel comparison yet.
 * Verification is exercised in a clean directory, not on a separate machine.
 * Capture costs about 2–3 ms per tool call on the author's Windows machine (two events, each
   flushed) — negligible next to an LLM call, but not free.

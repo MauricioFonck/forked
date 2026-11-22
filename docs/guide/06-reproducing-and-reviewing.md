@@ -23,8 +23,9 @@ What to check, and what a good reviewer does:
 2. **Try to break it.** The benchmark must be able to fail. Change FORKED on purpose (for example make
    `RedactionPolicy` stop redacting, or make replay call the tool) and confirm the matching scenario
    fails. If a scenario stays green when the behavior it covers is broken, that is a bug in the benchmark.
-3. **Read the baseline fairly.** Only a plain-log baseline is executed; the others are listed with the
-   reason they were not. Tell us if a comparison is unfair or missing.
+3. **Read the baselines fairly.** Plain logs are executed for four scenarios and LangGraph time travel for
+   one (S04); the others are listed with the reason they were not run. Tell us if a comparison is unfair
+   or missing.
 4. **Look for overclaiming** in the README and these docs. Anything stronger than the evidence
    should be reported.
 

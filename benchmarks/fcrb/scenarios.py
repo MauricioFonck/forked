@@ -278,6 +278,18 @@ def s04_external_write_in_replay(box: Sandbox) -> ScenarioResult:
     baseline.naive_replay(log, plain_outbox)
     plain_sent = len(list(plain_outbox.iterdir()))
 
+    baselines: dict[str, Any] = {}
+    try:
+        from benchmarks.fcrb import baseline_langgraph
+
+        lg_dir = box.root / "langgraph"
+        lg_dir.mkdir()
+        baselines["langgraph-time-travel"] = baseline_langgraph.time_travel_repeats_external_write(
+            lg_dir / "outbox"
+        )
+    except ImportError:
+        baselines["langgraph-time-travel"] = {"status": "skipped: langgraph extra not installed"}
+
     metrics = {
         "unsafe_effect_attempts": attempted,
         "unsafe_effects_executed": executed,
@@ -297,7 +309,8 @@ def s04_external_write_in_replay(box: Sandbox) -> ScenarioResult:
                 "unsafe_effect_attempts": 1,
                 "unsafe_effects_executed": plain_sent - 1,
                 "unsafe_effect_prevention_rate": 1 - (plain_sent - 1),
-            }
+            },
+            **baselines,
         },
     )
 
@@ -535,35 +548,62 @@ def s09_redaction(box: Sandbox) -> ScenarioResult:
 
 
 def s10_two_adapters(box: Sandbox) -> ScenarioResult:
-    try:
-        from examples import pydantic_ai_expense_agent as agent
-    except ImportError:
-        return ScenarioResult(
-            "S10",
-            "Two adapters producing equivalent protocol artifacts",
-            "skipped",
-            notes=["pydantic-ai extra not installed"],
-        )
     app = box.app()
     sdk = run_toy_agent(app.recorder, box.root / "outbox-sdk")
-    framework = agent.run_expense_agent(
-        app.recorder.record(agent.CAPABILITIES), box.root / "outbox-fw"
-    )
-    a = normalized_tool_events(app.inspect_run.execute(sdk).events)
-    b = normalized_tool_events(app.inspect_run.execute(framework).events)
+    reference = normalized_tool_events(app.inspect_run.execute(sdk).events, parse_json_outputs=True)
+    compared: dict[str, bool] = {}
+    skipped: list[str] = []
+    try:
+        from examples import pydantic_ai_expense_agent as pydantic_agent
+
+        run_id = pydantic_agent.run_expense_agent(
+            app.recorder.record(pydantic_agent.CAPABILITIES), box.root / "outbox-pydantic"
+        )
+        events = app.inspect_run.execute(run_id).events
+        compared["forked-pydantic-ai"] = (
+            normalized_tool_events(events, parse_json_outputs=True) == reference
+        )
+    except ImportError:
+        skipped.append("pydantic-ai")
+    try:
+        from examples import langgraph_expense_agent as langgraph_agent
+
+        run_id = langgraph_agent.run_expense_agent(
+            app.recorder.record(langgraph_agent.CAPABILITIES), box.root / "outbox-langgraph"
+        )
+        events = app.inspect_run.execute(run_id).events
+        compared["forked-langgraph"] = (
+            normalized_tool_events(events, parse_json_outputs=True) == reference
+        )
+    except ImportError:
+        skipped.append("langgraph")
+    if not compared:
+        return ScenarioResult(
+            "S10",
+            "Several adapters producing equivalent protocol artifacts",
+            "skipped",
+            notes=["no framework extra installed"],
+        )
     metrics = {
-        "adapters": ["forked-sdk (toy agent)", "forked-pydantic-ai"],
-        "tool_events_compared": len(a),
-        "artifacts_equivalent": a == b,
+        "adapters": ["forked-sdk (toy agent)", *compared],
+        "tool_events_compared": len(reference),
+        "artifacts_equivalent": all(compared.values()),
+        "equivalent_per_adapter": compared,
     }
+    ok = all(compared.values()) and bool(reference)
+    notes = [
+        "Equivalence is over tool events (names, effect classes, payloads, capture status); "
+        "adapter metadata legitimately differs.",
+        "LangGraph returns tool results as text, so outputs are compared after JSON-decoding.",
+    ]
+    if skipped:
+        notes.append(f"not run (extra not installed): {', '.join(skipped)}")
     return ScenarioResult(
         "S10",
-        "Two adapters producing equivalent protocol artifacts",
-        "pass" if a == b and a else "fail",
+        "Several adapters producing equivalent protocol artifacts",
+        "pass" if ok else "fail",
         metrics,
-        notes=[
-            "Equivalence is over tool events (names, effect classes, payloads, capture status); adapter metadata legitimately differs."
-        ],
+        notes=notes,
     )
 
 

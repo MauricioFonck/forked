@@ -64,3 +64,29 @@ denied in branches.
 * The `comparison` describes one recorded run pair. It is not a causal estimate.
 
 See [`benchmarks/`](../benchmarks/README.md) for the scenarios that exercise this adapter (S03, S10).
+
+## The same agent as a LangGraph graph
+
+```bash
+uv run python -m examples.langgraph_expense_agent
+```
+
+`forked_tool_node(tools, run, EFFECTS)` returns a `ToolNode` whose `wrap_tool_call` /
+`awrap_tool_call` route every call through FORKED; the "model" is a scripted node, so it is
+deterministic and offline. Output:
+
+```text
+1. recorded  run_…  outbox files: 1
+2. replayed  run_…  outbox files: 1  (nothing executed)
+3. #1 search_policy: same [replay]
+3. #2 get_exchange_rate: changed [intervene]
+3. #3 send_email: changed [deny]
+   claim level: controlled_comparison; outbox files: 1
+```
+
+Different from LangGraph's own time travel, which **re-executes** the nodes after a checkpoint
+(including tool calls): here a replayed call is answered from the recording and never runs.
+Limits: only `ToolNode` calls are observed (not the model node or graph state); tool results are the
+text LangGraph produces; a replayed result carries content only (no `artifact`); parallel calls of one
+step are serialized; a `Command` result is rejected. See
+[the guide](../docs/guide/04-instrumenting-your-workflow.md#langgraph).

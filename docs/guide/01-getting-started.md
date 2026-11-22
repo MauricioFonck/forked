@@ -14,7 +14,7 @@ uv run forked --version
 ```
 
 The core depends only on `pydantic` and `typer`. Framework adapters are **optional extras**
-(`forked-runtime[pydantic-ai]`); the core never imports them.
+(`forked-runtime[pydantic-ai]`, `forked-runtime[langgraph]`); the core never imports them.
 
 ## Your first minute
 

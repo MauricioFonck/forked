@@ -64,6 +64,16 @@ Versioning: [SemVer](https://semver.org/) for the package; the CIP schema is ver
     capture overhead, `results.json` + `REPORT.md`. Provisional and not validated.
   - `build_application(probe=...)`; `examples/pydantic_ai_expense_agent.py`.
 
+- LangGraph adapter (`pip install forked-runtime[langgraph]`): `forked_tool_node(tools, run, effects)`
+  returns a `ToolNode` whose `wrap_tool_call` / `awrap_tool_call` route every call through a
+  `RecordedRun`. Recording returns the original `ToolMessage`; replay answers from the recording and
+  never executes the tool; tool results are the text LangGraph produces; a `Command` result is
+  rejected; parallel calls of one step are serialized. `examples/langgraph_expense_agent.py`.
+- FCRB: LangGraph time travel is now an **executed** baseline for S04 (resuming from the checkpoint
+  before `send_email` sent the email again, as its documentation says); S10 compares three adapters;
+  the report records framework versions.
+- `docs/15-prior-art-matrix.md`: first-pass prior-art review (platforms, six open-source projects, five
+  papers) with sources, dates and confidence; the README comparison was rewritten from it.
+
 ### Not implemented yet
-- More framework adapters (LangGraph next), independent reproduction of the benchmark, a docs
-  site (Phase 6); user-approved effect policies; more intervention types; signed manifests.
+- More framework adapters, independent reproduction of the benchmark, a docs site; user-approved effect policies; more intervention types; signed manifests.

@@ -27,7 +27,8 @@ is covered by a test in this repository; the limits are listed because they are 
 * **Only instrumented calls are observed.** Code that does not go through `call_tool` can do
   anything; the `inv_no_live_side_effects` invariant only sees what the SDK sees. There is no process
   sandbox.
-* **Pydantic AI:** model requests are not recorded, and a real LLM usually diverges on replay. See
+* **Pydantic AI and LangGraph:** model requests (and, in LangGraph, every non-tool node and the graph
+  state) are not recorded, and a real LLM usually diverges on replay. See
   [4. Instrumenting your workflow](04-instrumenting-your-workflow.md).
 * **Redaction is pattern-based.** It catches secret-shaped values and sensitive key names; it can miss
   a secret in an unusual form and may over-redact. Do not rely on it for regulated data.

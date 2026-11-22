@@ -31,13 +31,21 @@ def test_deterministic_part_is_reproducible(results: dict[str, Any]) -> None:
 def test_no_combined_score_and_limitations_are_stated(results: dict[str, Any]) -> None:
     assert "score" not in json.dumps(results).replace("never combined into one score", "")
     assert any("not that the approach is validated" in x for x in results["limitations"])
-    assert "plain-log" in results["baselines"]["executed"]
-    assert set(results["baselines"]["not_executed"]) >= {"langgraph-checkpoints", "temporal-replay"}
+    assert set(results["baselines"]["executed"]) == {"plain-log", "langgraph-time-travel"}
+    assert set(results["baselines"]["not_executed"]) >= {"temporal-replay", "phoenix-experiments"}
+    assert "langgraph-checkpoints" not in results["baselines"]["not_executed"]  # it IS executed now
 
 
 def test_baseline_is_measured_not_assumed(results: dict[str, Any]) -> None:
     by_id = {s["id"]: s for s in results["scenarios"]}
     assert by_id["S04"]["baseline"]["plain-log"]["unsafe_effects_executed"] == 1
+    # LangGraph's own time travel re-executes the nodes after a checkpoint (documented): measured
+    assert by_id["S04"]["baseline"]["langgraph-time-travel"]["unsafe_effects_executed"] == 1
+    assert by_id["S04"]["metrics"]["unsafe_effects_executed"] == 0  # FORKED: nothing re-executed
+    assert by_id["S10"]["metrics"]["equivalent_per_adapter"] == {
+        "forked-pydantic-ai": True,
+        "forked-langgraph": True,
+    }
     assert by_id["S06"]["baseline"]["plain-log"]["missing_line_detected"] is False
     assert by_id["S08"]["baseline"]["plain-log"]["tampering_detected"] is False
     assert by_id["S09"]["baseline"]["plain-log"]["secret_occurrences_in_log"] >= 1

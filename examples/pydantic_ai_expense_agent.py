@@ -24,40 +24,16 @@ from pydantic_ai.messages import ModelMessage, ModelResponse, TextPart, ToolCall
 from pydantic_ai.models.function import AgentInfo, FunctionModel
 from pydantic_ai.toolsets import FunctionToolset
 
+from examples.expense_tools import EFFECTS, RATE_CALL, build_tools
 from forked.adapters.inbound.frameworks.pydantic_ai_toolset import (
     ForkedToolset,
     pydantic_ai_capabilities,
 )
 from forked.adapters.inbound.sdk.recorder import RecordedRun
 from forked.demo import toy_agent
-from forked.domain.effects.effect_class import EffectClass
 from forked.domain.shared.identifiers import RunId
 
-EFFECTS = {
-    "search_policy": EffectClass.PURE_LOCAL,
-    "get_exchange_rate": EffectClass.EXTERNAL_READ,
-    "send_email": EffectClass.EXTERNAL_WRITE,
-}
 CAPABILITIES = pydantic_ai_capabilities(EFFECTS)
-RATE_CALL = 3  # sequence of the get_exchange_rate tool.call in a recorded run
-
-
-def build_tools(outbox: Path) -> list[Callable[..., Any]]:
-    send = toy_agent.make_send_email(outbox)
-
-    def search_policy(query: str) -> list[str]:
-        """Search the expense policy."""
-        return [str(line) for line in toy_agent.search_policy(query)]
-
-    def get_exchange_rate(base: str, quote: str, api_key: str) -> float:
-        """Exchange rate (local stub table)."""
-        return toy_agent.get_exchange_rate(base, quote, api_key)
-
-    def send_email(to: str, subject: str, body: str) -> dict[str, Any]:
-        """Send the summary to finance (writes a file to a local outbox)."""
-        return dict(send(to, subject, body))
-
-    return [search_policy, get_exchange_rate, send_email]
 
 
 def _script(

@@ -56,6 +56,7 @@ class RecordedToolError(ForkedError):
     def __init__(self, error_type: str, message: str) -> None:
         super().__init__(f"{error_type}: {message}")
         self.error_type = error_type
+        self.message = message
 
 
 class RecordedRun:

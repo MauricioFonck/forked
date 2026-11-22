@@ -3,7 +3,7 @@
 ↑ [Memoria central](../README.md)
 
 > Documento **vivo**: se actualiza cada vez que una fase avanza. Última revisión: **2026-11-21**
-> ([sesión de la Fase 6](../sesiones/2026-11-22-f-fase-6-alfa-publica.md)).
+> ([sesión de arte previo, LangGraph y release](../sesiones/2026-11-22-g-arte-previo-langgraph-y-release.md)).
 
 ## Resumen
 
@@ -44,8 +44,12 @@
 - Documentación de usuario en `docs/guide/` (6 páginas), ejemplo mínimo sin framework, notas de versión **borrador**,
   plantilla de reporte de reproducción y guardián de documentación ([ADR-014](decisiones-arquitectura/ADR-014-documentacion-publica-y-puerta-de-release.md)).
 - La rueda (73 KB) se instala y ejecuta fuera del repo; el sdist pesa 116 KB.
-- **265 tests** (1 se salta en Windows: symlinks) (unidad, contrato, seguridad, integración, aceptación, guardianes) + ruff + mypy strict en verde, y
-  50 mutaciones dirigidas detectadas (una sobrevivió y generó un test nuevo, ver la
+- Segundo adaptador: **LangGraph** (`forked_tool_node`); el benchmark mide su viaje en el tiempo como línea base (S04: repitió
+  el email, FORKED 0) y S10 compara tres adaptadores ([ADR-016](decisiones-arquitectura/ADR-016-adaptador-langgraph-y-linea-base.md)).
+- **Primera pasada de arte previo** publicada ([`docs/15`](../../docs/15-prior-art-matrix.md), [ADR-015](decisiones-arquitectura/ADR-015-posicionamiento-tras-el-arte-previo.md)):
+  lo básico ya existe; la diferencia se afirma solo como combinación acotada. **Puerta parcialmente abierta.**
+- **281 tests** (1 se salta en Windows: symlinks) (unidad, contrato, seguridad, integración, aceptación, guardianes) + ruff + mypy strict en verde, y
+  57 mutaciones dirigidas detectadas (una sobrevivió y generó un test nuevo, ver la
   [bitácora de la Fase 3](../sesiones/2026-11-21-c-fase-3-ramas.md#6-cómo-verificar)). Comandos en las bitácoras
   ([Fases 0–1](../sesiones/2026-11-21-arranque-fase-0-y-1.md#6-cómo-verificar),
   [Fase 2](../sesiones/2026-11-21-b-publicacion-y-fase-2.md#6-cómo-verificar)).
@@ -54,8 +58,9 @@
 ## Qué NO funciona todavía
 
 - El manifiesto no está firmado: la integridad es consistencia interna ([ADR-012](decisiones-arquitectura/ADR-012-paquete-de-evidencia.md)).
-- Un solo framework (Pydantic AI); sin LangGraph. El benchmark **no tiene reproducción independiente** y solo una
-  línea base ejecutada.
+- Dos frameworks (Pydantic AI, LangGraph); solo se graban herramientas. El benchmark **no tiene reproducción
+  independiente** y solo dos líneas base ejecutadas.
+- La puerta de arte previo sigue **parcialmente abierta** ([arte previo](../investigacion/arte-previo.md)).
 - Una sola intervención (`replace_recorded_observation`) y una sola política (`default-deny/1`), sin
   aprobaciones del usuario.
 - No hay índice SQLite: listar runs recorre el directorio ([ADR-004](decisiones-arquitectura/ADR-004-persistencia-fase-1.md)).

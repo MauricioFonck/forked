@@ -81,8 +81,6 @@ def can_detect_missing_line(log: PlainLog) -> bool:
 NOT_EXECUTED = {
     "otel-trace-capture": "FORKED's OTel bridge exports to it; a generic capture has no effect "
     "classes, branches or integrity manifest, so most scenarios have no counterpart. Not run.",
-    "langgraph-checkpoints": "framework-native time travel needs a LangGraph workflow; FORKED has "
-    "no LangGraph adapter yet (ADR-013). Not run, not claimed.",
     "temporal-replay": "requires a Temporal deployment and deterministic workflow code; not "
     "applicable to the toy workflows used here. Not run.",
     "phoenix-experiments": "requires a Phoenix deployment and an LLM application; not applicable "

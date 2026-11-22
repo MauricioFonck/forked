@@ -37,10 +37,26 @@ LIMITATIONS = (
     "The workflows are toy and scripted; no real LLM, network or external system is involved.",
     "Results show FORKED behaves as specified on these scenarios, not that the approach is "
     "validated: that needs an independent reproduction (docs/08 §8.6).",
-    "Only a plain-log baseline is executed; the others are listed with the reason they were not.",
+    "Two baselines are executed: plain logs, and LangGraph time travel for S04 only. The "
+    "others are listed with the reason they were not. LangGraph's time travel is a different "
+    "tool for a different purpose; its re-execution of later nodes is documented default "
+    "behavior, not a defect.",
     "Overhead is measured for capture only (latency, storage); CPU and memory are not measured.",
     "Verification was exercised in a clean directory, not on a separate machine.",
 )
+
+
+def _framework_versions() -> dict[str, str]:
+    """Exact versions of what the scenarios ran against (docs/08 §8.5: pin and record them)."""
+    from importlib.metadata import PackageNotFoundError, version
+
+    found: dict[str, str] = {}
+    for name in ("pydantic-ai-slim", "langgraph", "langchain-core", "pydantic", "typer"):
+        try:
+            found[name] = version(name)
+        except PackageNotFoundError:
+            found[name] = "not installed"
+    return found
 
 
 def measure_overhead(warmup: int, measured: int) -> dict[str, Any]:
@@ -117,12 +133,20 @@ def run_all(*, with_overhead: bool = True, warmup: int = 20, measured: int = 200
         "note": "name provisional; metrics are reported separately and never combined into one score",
         "forked_version": __version__,
         "environment": {
+            "frameworks": _framework_versions(),
             "python": platform.python_version(),
             "implementation": platform.python_implementation(),
             "platform": platform.platform(terse=True),
         },
         "scenarios": [dataclasses.asdict(r) for r in results],
-        "baselines": {"executed": ["plain-log"], "not_executed": baseline.NOT_EXECUTED},
+        "baselines": {
+            "executed": ["plain-log", "langgraph-time-travel"],
+            "executed_scope": {
+                "plain-log": "S04, S06, S08, S09",
+                "langgraph-time-travel": "S04",
+            },
+            "not_executed": baseline.NOT_EXECUTED,
+        },
         "overhead": measure_overhead(warmup, measured) if with_overhead else None,
         "limitations": list(LIMITATIONS),
     }
@@ -145,13 +169,16 @@ def render_report(results: dict[str, Any]) -> str:
         "",
         "## Scenarios",
         "",
-        "| Id | Scenario | Result | Measured by FORKED | Plain-log baseline (measured) |",
+        "| Id | Scenario | Result | Measured by FORKED | Baselines (measured) |",
         "|---|---|---|---|---|",
     ]
     for s in results["scenarios"]:
         metrics = "; ".join(f"{k}={_cell(v)}" for k, v in s["metrics"].items()) or "—"
         base = (
-            "; ".join(f"{k}={_cell(v)}" for k, v in (s["baseline"].get("plain-log") or {}).items())
+            " | ".join(
+                f"**{name}**: " + "; ".join(f"{k}={_cell(v)}" for k, v in values.items())
+                for name, values in s["baseline"].items()
+            )
             or "—"
         )
         lines.append(f"| {s['id']} | {s['title']} | **{s['status']}** | {metrics} | {base} |")
