@@ -47,7 +47,8 @@
 | CP-040…042 | `test_pydantic_ai_adapter.py` (8) con red bloqueada | OK |
 | CP-043, 044 | `test_otel_bridge.py` (15) | OK |
 | CP-045, 046 | `test_fcrb.py` (8) + 9 mutaciones del producto | OK: cada defecto hace fallar su escenario |
-| Reproducción | clon limpio + `uv sync --locked` + benchmark + ejemplo | ver bitácora |
+| Reproducción | clon limpio de GitHub + `uv sync --locked` + benchmark | OK: 10/10 `pass`, salida 0 (hecha por el autor, no independiente) |
+| CI | 6 trabajos tras corregir el orden del script de humo | OK en Linux 3.11–3.14, Windows y macOS |
 | Estáticos | ruff · format · mypy strict (92 archivos) | OK |
 
 ## 5. Comportamientos nuevos que pasan a protegidos

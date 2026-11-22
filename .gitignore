@@ -30,3 +30,6 @@ contexto/.obsidian/workspace*.json
 .env
 .env.*
 !.env.example
+
+# local benchmark output (publish results deliberately, not by accident)
+/results/

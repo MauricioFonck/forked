@@ -75,4 +75,15 @@ fallaron): redacción apagada (S08, S09) · replay que ejecuta (S01–S04, S06) 
 (S08) · rama que muta al padre (S05, S07, S08, S09) · entorno sin comparar (S07). Tras corregir S06 y el runner, todas
 detectadas.
 
-Reproducción desde un clon limpio: ver la nota al final de esta sesión.
+### Reproducción desde un clon limpio
+
+Con el commit `7ce8038` de GitHub: `git clone` → `uv sync --locked` → `uv run python -m benchmarks.fcrb --out results/`
+⇒ 10/10 `pass`, salida 0, sin red ni API key. **La hizo el mismo autor**, así que cuenta como «las instrucciones
+funcionan», no como reproducción independiente (pendiente, T8 de la spec 006).
+
+### Incidente de CI (corregido)
+
+El primer push (`63652fd`) falló en las 6 plataformas: puse el round trip de OTel **después** del `rm -rf runs` del
+script de humo, así que no quedaba ningún run que exportar (`run_not_found`). Era un error de orden del script, no del
+producto; corregido en `7ce8038` tras ejecutar **localmente la misma secuencia del CI** (lección: no subir un paso de
+CI sin haberlo corrido). CI en verde después en Linux 3.11–3.14, Windows y macOS.
