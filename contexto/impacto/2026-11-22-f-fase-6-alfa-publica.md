@@ -48,7 +48,8 @@
 | CP-049 | 2 mutaciones (palabras de novedad; aviso del README quitado) | OK |
 | CP-050 | rueda instalada en un entorno aislado y sin el repo: `--version`, `record`, `inspect --strict`; extra ausente ⇒ error accionable | OK |
 | CP-051 | `test_examples.py` + ejecución del ejemplo | OK |
-| Guía | «primer minuto» ejecutado desde un clon limpio | ver bitácora |
+| Guía | «primer minuto» ejecutado al pie de la letra desde un clon limpio de GitHub | OK (hecho por el autor) |
+| CI | 6 trabajos con el paso de rueda aislada y el ejemplo mínimo | OK |
 | Estáticos | ruff · format · mypy strict (95 archivos) | OK |
 
 ## 5. Comportamientos nuevos que pasan a protegidos

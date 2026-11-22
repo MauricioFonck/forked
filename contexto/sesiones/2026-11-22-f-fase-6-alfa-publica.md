@@ -67,6 +67,12 @@ uv build --out-dir dist/            # rueda 73 KB, sdist 116 KB
 uv run --isolated --no-project --with dist/*.whl python -m forked record toy-agent   # fuera del repo
 ```
 
+Verificación desde un clon limpio de GitHub (commit `cac42e0`), siguiendo la guía «primer minuto» **al pie de la letra**:
+`uv sync --locked` → `record` → `inspect --events` → `replay` → `branch --at 3 --value 0.5` → `compare` → `export` →
+borrar `.forked/` → `verify` (integridad ok, validez `controlled_comparison`) → `examples.minimal_sdk`. Todo funcionó sin
+tocar nada. **La hizo el mismo autor**, no una persona ajena: cuenta como «la guía funciona», no como prueba de que un
+recién llegado la entiende. CI en verde en los 6 trabajos, incluido el paso de la rueda aislada.
+
 Mutaciones sobre la **documentación** (aplicadas y revertidas; cada una hace fallar el guardián): comando inventado ·
 enlace roto en la guía · comando sin documentar en la referencia · fragmento de Python inválido · enlace roto en el
 README · palabras de novedad · aviso de arte previo quitado.

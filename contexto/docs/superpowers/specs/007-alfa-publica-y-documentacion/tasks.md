@@ -10,7 +10,7 @@
 - [x] T6 · Aviso de «no es arte previo» en la tabla comparativa del README + guardia
 - [x] T7 · Plantilla `reproduction_report`, CONTRIBUTING «dónde ayudar», etiquetas `reproduction` y `proposal`
 - [x] T8 · Notas de versión **borrador**; CI: paso de rueda, ejemplo mínimo
-- [x] T9 · Seguir la guía de «primer minuto» desde un clon limpio
+- [x] T9 · Seguir la guía de «primer minuto» desde un clon limpio (hecho por el autor; falta que lo haga alguien ajeno)
 - [ ] T10 · **Decisión del dueño:** etiquetar `v0.1.0-alpha.1`, GitHub Release, PyPI, Discussions
 - [ ] T11 · Matriz de arte previo (puerta abierta) y reproducción independiente (requiere a otra persona)
 - [ ] T12 · Sitio de documentación, si hace falta (YAGNI hasta entonces)
