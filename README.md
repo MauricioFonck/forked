@@ -122,7 +122,14 @@ claims more than the evidence supports — say, `conditional_causal`, or an inva
 `verified` that recomputes as `violated` — fails as an **unsupported claim**). The manifest is
 not signed: compare its `package_digest` with a copy you obtained another way.
 
-## Why this is different
+## How it compares
+
+> **Illustrative, not a prior-art review.** The columns are *categories*, generalized from the
+> [competitive landscape](docs/03-competitive-landscape.md); individual tools may do more than a
+> category suggests. "❌" means "not a core feature of the category as we understand it", not "no tool
+> does this". The prior-art matrix is still open ([`docs/12`](docs/12-decisions-and-open-questions.md)
+> §12.3), so nothing here claims FORKED is first, unique or a standard. Corrections are welcome:
+> open a [proposal](https://github.com/MauricioFonck/forked/issues/new?template=proposal.yml).
 
 | | Plain logs / tracing | Framework time-travel | **FORKED** |
 |---|---|---|---|
@@ -179,6 +186,15 @@ flowchart LR
 Event schema v0.1.0: [`spec/cip/v0.1/event.schema.json`](spec/cip/v0.1/event.schema.json).
 
 ## Documentation
+
+**Using FORKED:** [User guide](docs/README.md) — [getting started](docs/guide/01-getting-started.md) ·
+[concepts](docs/guide/02-concepts.md) · [CLI reference](docs/guide/03-cli-reference.md) ·
+[instrumenting your workflow](docs/guide/04-instrumenting-your-workflow.md) ·
+[guarantees and limits](docs/guide/05-guarantees-and-limits.md) ·
+[reproducing and reviewing](docs/guide/06-reproducing-and-reviewing.md) ·
+[release notes (draft)](docs/release-notes/v0.1.0-alpha.1.md).
+
+**Design documents** (why it is built this way):
 
 | | |
 |---|---|

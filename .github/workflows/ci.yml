@@ -54,10 +54,22 @@ jobs:
           uv run forked verify "$RUNNER_TEMP/evidence"
           rm -rf "$FORKED_STORE/runs" && uv run forked verify "$RUNNER_TEMP/evidence"  # needs only the package
           test "$(ls "$FORKED_STORE/toy-outbox" | wc -l)" -eq 1  # replay and branch sent nothing
-      - name: Pydantic AI example and FCRB benchmark (offline)
+      - name: Package smoke test (the built wheel, without the repository)
+        shell: bash
+        run: |
+          uv build --out-dir "$RUNNER_TEMP/dist"
+          WHEEL=$(ls "$RUNNER_TEMP"/dist/*.whl)
+          export FORKED_STORE="$RUNNER_TEMP/wheel-store"
+          cd "$RUNNER_TEMP"
+          uv run --isolated --no-project --with "$WHEEL" python -m forked --version
+          uv run --isolated --no-project --with "$WHEEL" python -m forked record toy-agent
+          RUN_ID=$(uv run --isolated --no-project --with "$WHEEL" python -m forked runs | awk '{print $1}')
+          uv run --isolated --no-project --with "$WHEEL" python -m forked inspect "$RUN_ID" --strict
+      - name: Examples and FCRB benchmark (offline)
         shell: bash
         run: |
           export PYDANTIC_AI_NO_BANNER=1
+          uv run python -m examples.minimal_sdk
           uv run python -m examples.pydantic_ai_expense_agent
           uv run python -m benchmarks.fcrb --out "$RUNNER_TEMP/fcrb"
           grep -q "S10" "$RUNNER_TEMP/fcrb/REPORT.md"

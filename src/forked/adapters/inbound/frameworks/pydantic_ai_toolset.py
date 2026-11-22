@@ -23,9 +23,15 @@ Guarantees and limits (also declared in the adapter capabilities, so every repor
 from collections.abc import Mapping
 from typing import Any, Literal
 
-from pydantic_ai import RunContext
-from pydantic_ai.tools import AgentDepsT
-from pydantic_ai.toolsets import AbstractToolset, ToolsetTool, WrapperToolset
+try:
+    from pydantic_ai import RunContext
+    from pydantic_ai.tools import AgentDepsT
+    from pydantic_ai.toolsets import AbstractToolset, ToolsetTool, WrapperToolset
+except ModuleNotFoundError as exc:  # the framework is an opt-in extra, never a core dependency
+    raise ImportError(
+        "the Pydantic AI adapter needs the optional extra: "
+        "pip install 'forked-runtime[pydantic-ai]'"
+    ) from exc
 
 from forked.adapters.inbound.sdk.recorder import RecordedRun
 from forked.domain.effects.effect_class import EffectClass

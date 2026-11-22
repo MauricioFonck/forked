@@ -24,6 +24,7 @@ Añade una entrada cuando tomes una decisión arquitectónica relevante, con la 
 | [007](ADR-007-omitir-no-truncar.md) | Payload grande: omitir con digest, nunca truncar; sobre-redacción aceptada | Vigente | `application/capture.py` |
 | [008](ADR-008-toolchain.md) | uv + hatchling, Python ≥ 3.11, Pydantic solo en el borde | Vigente | `pyproject.toml`, `uv.lock` |
 | [009](ADR-009-secuencia-ids-tiempo.md) | Secuencia contigua desde 0, ids aleatorios, tiempo UTC con zona | Vigente | `domain/runs/run.py`, `domain/runs/sequence.py` |
+| [014](ADR-014-documentacion-publica-y-puerta-de-release.md) | Documentación pública verificada por tests; sin release sin decisión del dueño | Vigente | `tests/guardians/test_public_docs.py`, `docs/guide/` |
 | [013](ADR-013-framework-puente-otel-y-benchmark.md) | Pydantic AI primero (por factibilidad, sin datos de demanda); puente OTLP/JSON sin SDK de OTel; benchmark que debe poder fallar | Vigente | `adapters/inbound/frameworks/`, `domain/telemetry/`, `benchmarks/` |
 | [012](ADR-012-paquete-de-evidencia.md) | Paquete = directorio determinista; integridad y validez separadas; validez por recálculo; sin firma | Vigente | `domain/evidence/package.py`, `tests/acceptance/test_evidence.py` |
 | [011](ADR-011-ramas-checkpoint-y-comparacion.md) | Checkpoint = secuencia de un `tool.call`; una intervención; política default-deny; invariantes y nivel de afirmación | Vigente | `domain/branches/`, `domain/comparison/`, `tests/acceptance/test_branch.py` |

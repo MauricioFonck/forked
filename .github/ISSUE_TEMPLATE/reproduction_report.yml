@@ -1,0 +1,59 @@
+name: Reproduction report
+description: You ran the FCRB benchmark (or the examples) from a clean clone. Tell us what happened — failures included.
+labels: [reproduction]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The benchmark has **not been independently reproduced yet**, so every report helps — including
+        "it did not work for me". Steps: [docs/guide/06-reproducing-and-reviewing.md](https://github.com/MauricioFonck/forked/blob/main/docs/guide/06-reproducing-and-reviewing.md).
+  - type: input
+    id: commit
+    attributes:
+      label: Commit you tested
+      description: Output of `git rev-parse HEAD`.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: OS, Python and uv versions
+      placeholder: "Ubuntu 24.04, Python 3.12.3, uv 0.9.x"
+    validations:
+      required: true
+  - type: dropdown
+    id: independence
+    attributes:
+      label: Are you a project author or maintainer?
+      description: The release gate needs reproduction by someone independent. Either answer is welcome.
+      options: ["No, I am independent", "Yes, I am an author or maintainer"]
+    validations:
+      required: true
+  - type: dropdown
+    id: result
+    attributes:
+      label: Result of `uv run python -m benchmarks.fcrb --out results/`
+      options:
+        - All ten scenarios passed
+        - Some scenarios failed or were skipped
+        - It did not run (install or runtime error)
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Scenario output
+      description: Paste the ten `S01 … S10` lines, and any error. Attach `results/results.json` if you can.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: break
+    attributes:
+      label: Did you try to break it?
+      description: What did you change on purpose, and did the matching scenario fail? A scenario that stays green when its behavior is broken is a benchmark bug.
+  - type: textarea
+    id: critique
+    attributes:
+      label: Anything unfair, missing or overstated?
+      description: Baselines, metrics, README or docs claims stronger than the evidence.

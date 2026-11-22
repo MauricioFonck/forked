@@ -29,7 +29,7 @@ uv run forked record toy-agent
 
 ## Workflow
 
-- Open an issue (bug or proposal) describing the problem and acceptance criteria.
+- Open an issue (bug, proposal or [reproduction report](.github/ISSUE_TEMPLATE/reproduction_report.yml)) describing the problem and acceptance criteria.
 - Branch from `main`, keep commits focused, and fill in the PR template's checklists.
 - Protocol or schema changes: regenerate `spec/` with `uv run python scripts/export_schemas.py`,
   add new golden fixtures (never edit published ones) and follow the versioning rules in
@@ -37,6 +37,22 @@ uv run forked record toy-agent
 - Maintainers keep an internal engineering memory in [`contexto/`](contexto/README.md)
   (Spanish): session logs, impact analyses, ADRs and failure records. Contributors are
   welcome to read it; you do not need to write to it.
+
+## Where help is most useful
+
+Concrete, scoped work, roughly in order of value. Open an issue first so we agree on acceptance
+criteria (including failure and unsafe cases):
+
+1. **Reproduce the benchmark** and file a [reproduction report](docs/guide/06-reproducing-and-reviewing.md).
+   The release gate in [`docs/08`](docs/08-benchmarks-and-validation.md) needs someone independent.
+2. **Try to break a guarantee** ([guarantees](docs/guide/05-guarantees-and-limits.md)); report bypasses
+   privately via [SECURITY.md](SECURITY.md).
+3. **A second framework adapter** (LangGraph is the natural next one, and also the natural baseline).
+   The contract is in [instrumenting your workflow](docs/guide/04-instrumenting-your-workflow.md#writing-an-adapter-for-another-framework).
+4. **A prior-art matrix** with dated URLs and a confidence level for each claim
+   ([`docs/12`](docs/12-decisions-and-open-questions.md) §12.3). No claim of novelty until it exists.
+5. **More benchmark scenarios or baselines** — especially ones that could make FORKED look bad.
+6. **Docs:** anything that confused you on your first run is a bug in the docs.
 
 ## Licensing
 

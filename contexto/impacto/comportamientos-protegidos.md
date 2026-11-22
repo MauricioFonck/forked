@@ -92,3 +92,13 @@
 | CP-044 | Un trace importado marca todo `unknown`, completitud desconocida, misma forma de payload que el SDK (reproducible y bifurcable); trazas malformadas, vacías o enormes se rechazan; secretos redactados | `test_round_trip_import_marks_every_effect_unknown` · `test_imported_run_can_be_branched_and_denies_unknown_effects` · `test_malformed_traces_are_rejected` · `test_too_many_spans_are_refused` · `test_secret_in_imported_arguments_is_redacted` | ADR-013 |
 | CP-045 | El runner reporta un escenario que revienta como `fail` (no aborta), no combina métricas en un puntaje, su parte determinista es reproducible y **el benchmark puede fallar** | `test_fcrb.py::test_a_crashing_scenario_is_reported_as_failed_not_raised` · `test_deterministic_part_is_reproducible` · `test_no_combined_score_and_limitations_are_stated` · `test_benchmark_can_fail_when_an_unsafe_effect_is_allowed` · 9 mutaciones | `docs/08` §8.3, §8.5 |
 | CP-046 | Las líneas base se **miden** (no se afirman) y las no ejecutadas se listan con su motivo | `test_baseline_is_measured_not_assumed` · `NOT_EXECUTED` | `docs/08` §8.4 |
+
+## Documentación pública, ejemplos y empaquetado
+
+| Id | Comportamiento | Red de seguridad | Origen |
+|---|---|---|---|
+| CP-047 | La referencia de la CLI documenta **exactamente** los comandos que existen: ni falta uno ni hay uno inventado | `test_public_docs.py::test_every_command_is_documented_and_nothing_is_invented` · mutación (2 rojos) | [ADR-014](../forked/decisiones-arquitectura/ADR-014-documentacion-publica-y-puerta-de-release.md) |
+| CP-048 | Los enlaces relativos del README y de las páginas de usuario resuelven; todo `forked <comando>` mencionado existe; los fragmentos de Python de la guía parsean | `test_relative_links_resolve` · `test_documented_commands_exist` · `test_python_snippets_parse` · mutaciones (1, 1, 1, 1) | ADR-014 |
+| CP-049 | La documentación pública no afirma novedad ni superlativos mientras el arte previo esté abierto, y el README conserva el aviso de que su comparación no es una revisión de arte previo | `test_no_novelty_or_superlative_claims_while_prior_art_is_unreviewed` · `test_readme_discloses_that_its_comparison_is_not_a_prior_art_review` · mutaciones (1 y 1) | [arte previo](../investigacion/arte-previo.md) |
+| CP-050 | La rueda construida se instala y ejecuta **fuera del repositorio**; el adaptador de Pydantic AI sin su extra da un error accionable | paso de CI «Package smoke test» · `test_missing_extra_gives_an_actionable_error` | ADR-014 |
+| CP-051 | Los ejemplos documentados siguen funcionando | `tests/acceptance/test_examples.py` · pasos de CI | ADR-014 |

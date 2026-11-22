@@ -3,7 +3,7 @@
 ↑ [Memoria central](../README.md)
 
 > Documento **vivo**: se actualiza cada vez que una fase avanza. Última revisión: **2026-11-21**
-> ([sesión de la Fase 5](../sesiones/2026-11-22-e-fase-5-adaptador-y-benchmark.md)).
+> ([sesión de la Fase 6](../sesiones/2026-11-22-f-fase-6-alfa-publica.md)).
 
 ## Resumen
 
@@ -15,7 +15,7 @@
 | 3 | Ramas, una intervención, política default-deny, invariantes, comparación | ✅ Hecha | [004](../docs/superpowers/specs/004-ramas-e-intervencion/spec.md) |
 | 4 | Paquete de evidencia + verificador offline | ✅ Hecha | [005](../docs/superpowers/specs/005-paquete-de-evidencia/spec.md) |
 | 5 | Puente OpenTelemetry, primer adaptador de framework (Pydantic AI), FCRB | ✅ Hecha (sin reproducción independiente) | [006](../docs/superpowers/specs/006-adaptador-y-benchmark/spec.md) |
-| 6 | Alfa pública y comunidad | ⏳ Siguiente | — |
+| 6 | Alfa pública y comunidad | ✅ Preparada; **release pendiente de decisión del dueño** | [007](../docs/superpowers/specs/007-alfa-publica-y-documentacion/spec.md) |
 
 ## Qué funciona hoy (verificado)
 
@@ -41,8 +41,11 @@
 - `forked otel-export` / `otel-import`: puente OTLP/JSON ([formato](../protocolo/puente-opentelemetry.md)).
 - `python -m benchmarks.fcrb`: 10 escenarios + línea base de logs simples ejecutada; 10/10 `pass`; costo de captura
   ≈ 2,4 ms por llamada ([contexto `benchmarks`](../modulos/benchmarks/README.md)). **Provisional: no validado.**
-- **219 tests** (1 se salta en Windows: symlinks) (unidad, contrato, seguridad, integración, aceptación, guardianes) + ruff + mypy strict en verde, y
-  43 mutaciones dirigidas detectadas (una sobrevivió y generó un test nuevo, ver la
+- Documentación de usuario en `docs/guide/` (6 páginas), ejemplo mínimo sin framework, notas de versión **borrador**,
+  plantilla de reporte de reproducción y guardián de documentación ([ADR-014](decisiones-arquitectura/ADR-014-documentacion-publica-y-puerta-de-release.md)).
+- La rueda (73 KB) se instala y ejecuta fuera del repo; el sdist pesa 116 KB.
+- **265 tests** (1 se salta en Windows: symlinks) (unidad, contrato, seguridad, integración, aceptación, guardianes) + ruff + mypy strict en verde, y
+  50 mutaciones dirigidas detectadas (una sobrevivió y generó un test nuevo, ver la
   [bitácora de la Fase 3](../sesiones/2026-11-21-c-fase-3-ramas.md#6-cómo-verificar)). Comandos en las bitácoras
   ([Fases 0–1](../sesiones/2026-11-21-arranque-fase-0-y-1.md#6-cómo-verificar),
   [Fase 2](../sesiones/2026-11-21-b-publicacion-y-fase-2.md#6-cómo-verificar)).
@@ -59,6 +62,7 @@
 
 ## Próximo paso
 
-Fase 6 (alfa pública): sitio de docs o Markdown bien organizado, repositorio de ejemplos, notas de versión y recoger
-feedback. Antes de comunicar algo como «novedoso»: cerrar la [puerta de arte previo](../investigacion/arte-previo.md).
-Pedir a alguien ajeno que **reproduzca el benchmark** desde un clon limpio (T8 de la [spec 006](../docs/superpowers/specs/006-adaptador-y-benchmark/tasks.md)).
+**Decisión del dueño sobre el release** (etiquetar `v0.1.0-alpha.1`, GitHub Release, ¿PyPI?, Discussions): ver la
+[bitácora de la Fase 6](../sesiones/2026-11-22-f-fase-6-alfa-publica.md#5-qué-quedó-pendiente--decisiones-para-el-usuario).
+Después, por valor: la **matriz de arte previo** (puerta abierta), una **reproducción independiente** del benchmark y
+un segundo adaptador (LangGraph) con su línea base de viaje en el tiempo nativo.

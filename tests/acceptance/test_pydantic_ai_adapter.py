@@ -196,3 +196,16 @@ def test_pydantic_ai_and_sdk_adapters_produce_equivalent_tool_artifacts(
     framework = _record(app, tmp_path / "outbox-fw")
     a, b = (normalized_tool_events(app.inspect_run.execute(r).events) for r in (sdk, framework))
     assert a == b
+
+
+def test_missing_extra_gives_an_actionable_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    import importlib
+    import sys
+
+    import forked.adapters.inbound.frameworks.pydantic_ai_toolset as module
+
+    monkeypatch.setitem(sys.modules, "pydantic_ai", None)  # what an absent package looks like
+    with pytest.raises(ImportError, match=r"forked-runtime\[pydantic-ai\]"):
+        importlib.reload(module)
+    monkeypatch.undo()
+    importlib.reload(module)  # leave the module usable for the other tests

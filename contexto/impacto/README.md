@@ -42,6 +42,7 @@ experimento (un secreto que vuelve a disco, un run parcial que se reporta comple
 
 | Fecha | Cambio | Comportamientos tocados | Resultado |
 |---|---|---|---|
+| 2026-11-22 | [Fase 6: alfa pública (docs, ejemplos, empaquetado, feedback)](2026-11-22-f-fase-6-alfa-publica.md) | CP-001…CP-046 (sin regresión) · CP-047…CP-051 (nuevos) | Verificado: 265 tests + ruff + mypy strict; 7 mutaciones de la documentación detectadas |
 | 2026-11-22 | [Fase 5: adaptador Pydantic AI, puente OTel y benchmark FCRB](2026-11-22-e-fase-5-adaptador-y-benchmark.md) | CP-001…CP-039 (sin regresión) · CP-040…CP-046 (nuevos) | Verificado: 219 tests + ruff + mypy strict; 9 mutaciones del producto detectadas por el benchmark |
 | 2026-11-21 | [Fase 4: paquete de evidencia y verificador offline](2026-11-21-d-fase-4-evidencia.md) | CP-001…CP-032 (sin regresión) · CP-033…CP-039 (nuevos) | Verificado: 178 tests + ruff + mypy strict; 8 mutaciones detectadas |
 | 2026-11-21 | [Fase 3: ramas, intervención, política y comparación](2026-11-21-c-fase-3-ramas.md) | CP-001…CP-025 (sin regresión) · CP-026…CP-032 (nuevos) | Verificado: 155 tests + ruff + mypy strict; 6 mutaciones detectadas (1 tras un test nuevo) |
