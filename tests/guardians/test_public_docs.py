@@ -20,6 +20,7 @@ PAGES = [
     ROOT / "README.md",
     ROOT / "CONTRIBUTING.md",
     ROOT / "docs" / "README.md",
+    ROOT / "docs" / "15-prior-art-matrix.md",
     ROOT / "examples" / "README.md",
     ROOT / "benchmarks" / "README.md",
     *sorted((ROOT / "docs" / "guide").glob("*.md")),
@@ -75,10 +76,21 @@ def test_python_snippets_parse(page: Path) -> None:
             pytest.fail(f"{page.name}: python snippet #{number} does not parse: {exc}")
 
 
-def test_readme_discloses_that_its_comparison_is_not_a_prior_art_review() -> None:
+def test_readme_comparison_points_to_the_evidence_and_admits_what_already_exists() -> None:
     text = (ROOT / "README.md").read_text(encoding="utf-8")
-    assert "not a prior-art review" in text
-    assert "nothing here claims FORKED is first, unique or a standard" in text
+    assert "docs/15-prior-art-matrix.md" in text
+    assert "already done" in text  # recording and replay are not claimed as new
+    assert "not found in what we read" in text  # a gap in our reading, not proof of absence
+    assert "Nothing here claims FORKED is first, unique or a standard" in text
+
+
+def test_prior_art_matrix_states_its_limits() -> None:
+    text = (ROOT / "docs" / "15-prior-art-matrix.md").read_text(encoding="utf-8")
+    assert "A first pass, not a complete survey" in text
+    assert "not found in the sources we read" in text.lower() or "Not found" in text
+    assert "Not yet reviewed" in text
+    assert "https://" in text
+    assert "retrieved" in text.lower()
 
 
 OVERCLAIMS = re.compile(

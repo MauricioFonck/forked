@@ -33,3 +33,4 @@ where they differ from the user guide, the guide describes the current behavior.
 | [08 Benchmarks & validation](08-benchmarks-and-validation.md) · [09 Roadmap](09-roadmap-and-backlog.md) | FCRB, phases |
 | [10 Governance](10-governance-and-open-source.md) · [11 Partnerships](11-partnership-strategy.md) · [12 Decisions & open questions](12-decisions-and-open-questions.md) | Project and community |
 | [13 Claude Code execution plan](13-claude-code-execution-plan.md) · [Diagrams](diagrams.md) · [References](references.md) | |
+| [15 Prior-art matrix](15-prior-art-matrix.md) | What already exists (first pass, 2026-11-22), with sources and confidence |

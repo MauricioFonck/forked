@@ -124,21 +124,23 @@ not signed: compare its `package_digest` with a copy you obtained another way.
 
 ## How it compares
 
-> **Illustrative, not a prior-art review.** The columns are *categories*, generalized from the
-> [competitive landscape](docs/03-competitive-landscape.md); individual tools may do more than a
-> category suggests. "❌" means "not a core feature of the category as we understand it", not "no tool
-> does this". The prior-art matrix is still open ([`docs/12`](docs/12-decisions-and-open-questions.md)
-> §12.3), so nothing here claims FORKED is first, unique or a standard. Corrections are welcome:
-> open a [proposal](https://github.com/MauricioFonck/forked/issues/new?template=proposal.yml).
+> **Read the evidence, not this table:** [`docs/15-prior-art-matrix.md`](docs/15-prior-art-matrix.md)
+> is a first-pass prior-art review (2026-11-22) with sources, dates and a confidence level per row.
+> Its main finding is a humbling one: recording a run, replaying it from recorded observations,
+> replacing a tool result, hashing and redaction are **already done** — by platforms, by several small
+> open-source projects and by recent research. FORKED does not claim those as new. In the sources
+> reviewed we did **not find** the *combination* below. "—" means "not found in what we read", not
+> "does not exist". Nothing here claims FORKED is first, unique or a standard. Corrections are
+> welcome: open a [proposal](https://github.com/MauricioFonck/forked/issues/new?template=proposal.yml).
 
-| | Plain logs / tracing | Framework time-travel | **FORKED** |
+| | LangGraph time travel | Open-source record/replay tools | **FORKED** |
 |---|---|---|---|
-| Records what happened | ✅ | ✅ | ✅ typed, ordered, redacted events |
-| Says what was **not** captured | ❌ | ❌ | ✅ explicit missing-evidence list |
-| Classifies side effects | ❌ | app-specific | ✅ CIP effect taxonomy, default-deny policy |
-| Branch with a declared intervention | ❌ | ✅ (one framework) | ✅ framework-neutral (SDK) |
-| Invariants as `verified / violated / unknown` | ❌ | ❌ | ✅ |
-| Portable, offline-verifiable evidence | ❌ | ❌ | ✅ |
+| Replays from recorded observations **without re-executing** tools | — (documented: nodes after the checkpoint re-execute) | ✅ | ✅ |
+| Branches with a replaced observation | ✅ (later nodes re-execute) | ◐ one project | ✅ |
+| **Effect classes + default-deny** for replay and branches | — | — (one lists it as planned) | ✅ |
+| **Invariants** as `verified / violated / unknown` | — | — | ✅ |
+| **Claim levels** capped below causal | n/a | — | ✅ |
+| **Portable package** whose validity is recomputed offline | — | — | ✅ |
 
 FORKED **complements** OpenTelemetry, LangGraph, Temporal, Phoenix and LangSmith — it does
 not replace them. See the scoped [competitive landscape](docs/03-competitive-landscape.md).

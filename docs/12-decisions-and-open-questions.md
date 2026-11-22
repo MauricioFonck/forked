@@ -37,5 +37,7 @@ Before calling CIP novel or proposing it as a standard:
 - compare data models and semantics, not only product names;
 - publish a prior-art matrix with dated URLs and confidence levels.
 
+**Status 2026-11-22:** a first-pass matrix is published in [15-prior-art-matrix.md](15-prior-art-matrix.md). The gate is **partially open**: OpenInference, W3C Trace Context, OCI/in-toto, patents and a data-model comparison are not yet reviewed, so novelty claims stay prohibited.
+
 ## 12.4 Naming
 FORKED, CIP, and FCRB are working names. Check package-name, domain, trademark, and repository availability before public launch.
